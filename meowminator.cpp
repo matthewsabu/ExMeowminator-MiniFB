@@ -11,17 +11,17 @@ int generate_RandomY();
 
 typedef struct
 {
-	int* x;
-	int* x_old;
-	int* y;
-	int* y_old;
-	int* s;
+	int *x;
+	int *x_old;
+	int *y;
+	int *y_old;
+	int *s;
 
-	int* map_x;
-	int* map_y;
+	int *map_x; 
+	int *map_y; 
 	//int *map_change;
-	int* m;
-	int* map_ctr;
+	int *m;
+	int *map_ctr;
 
 	int* a;
 	int* dir;
@@ -29,8 +29,8 @@ typedef struct
 } user_data;
 
 int randomizer = 1; // RANDOMIZE ONCE ONLY
-int rand_xnum = 0;
-int rand_ynum = 0;
+int rand_xnum = 0; //-200
+int rand_ynum = 0; //30
 int rand_x[10] = {};
 int rand_y[10] = {};
 
@@ -44,13 +44,13 @@ int main()
 
 	user_data udata;
 
-	uint32_t* buffer = (uint32_t*)malloc(1100 * 833 * 4);
+	uint32_t* buffer = (uint32_t*)malloc(1436 * 1293 * 4);
 
 	//FIBITMAP* fi_bg = FreeImage_Load(FIF_JPEG, "assets/bg.jpg");
 	//FreeImage_FlipVertical(fi_bg);
 	//uint8_t* bg = FreeImage_GetBits(fi_bg);
 
-	FIBITMAP* fi_bg1 = FreeImage_Load(FIF_JPEG, "assets_meow/f2_bedroom_new.jpg");
+	FIBITMAP* fi_bg1 = FreeImage_Load(FIF_JPEG, "assets_meow/f2_bedroom_new2.jpg");
 	FreeImage_FlipVertical(fi_bg1);
 	uint8_t* bg1 = FreeImage_GetBits(fi_bg1);
 
@@ -175,7 +175,7 @@ int main()
 	uint8_t* taser_attack = FreeImage_GetBits(fi_sprite30);
 
 	FIBITMAP* fi_sprite31 = FreeImage_Load(FIF_PNG, "assets_meow/Sword_Attack.png");
-	FreeImage_FlipVertical(fi_sprite31);
+	FreeImage_FlipVertical(fi_sprite30);
 	uint8_t* sword_attack = FreeImage_GetBits(fi_sprite31);
 
 	FIBITMAP* fi_sprite32 = FreeImage_Load(FIF_PNG, "assets_meow/Easy_Up.png");
@@ -231,13 +231,13 @@ int main()
 	//	buffer[i / 3] = (bg2[i + 2] << 16) | (bg2[i + 1] << 8) | bg2[i];
 
 	mfb_set_keyboard_callback(window, key_press);
-	mfb_set_user_data(window, (void*)&udata);
+	mfb_set_user_data(window, (void *)& udata);
 
 	srand(time(0));
 
 	do {
-		static int map_x = 1100; //988
-		static int map_y = 833; //1062
+		static int map_x = 1436; //988
+		static int map_y = 1293; //1062
 		//static int map_change = 0;
 		static int m = 0;
 		static int map_ctr = 0;
@@ -249,7 +249,7 @@ int main()
 		//udata.map_change = &map_change;
 		udata.m = &m;
 		udata.map_ctr = &map_ctr;
-
+		
 		// Copies the full background to the framebuffer
 		//if (map_change == 0) {
 		//	if (map_ctr > 0 && map_ctr < 2) {
@@ -284,7 +284,7 @@ int main()
 
 		for (int i = 0; i < map_x * map_y * 3; i += 3)
 			buffer[i / 3] = (maps[m][i + 2] << 16) | (maps[m][i + 1] << 8) | maps[m][i];
-
+		
 		static int bg_x = 0;
 		static int bg_y = 0;
 		static int bg_x_old = bg_x;
@@ -437,6 +437,14 @@ int main()
 			randomizer = 0; // set randomizer 1 again after wave is done
 		}
 
+		for (int i = 0; i < 10; i++) {
+			printf("X [%d] = %d\n", i, rand_x[i]);
+		}
+
+		for (int j = 0; j < 10; j++) {
+			printf("Y [%d] = %d\n", j, rand_y[j]);
+		}
+
 		if (wave == 1) { // first wave, 5 rats
 			for (int x = 0; x < 4; x++) { // 4 easy
 				for (int i = 0; i < 22; i++)
@@ -448,7 +456,7 @@ int main()
 						uint8_t b = easy[x][28 * 4 * i + 4 * j];
 						uint32_t pixel = (r << 16) | (g << 8) | b;
 						if (pixel)
-							buffer[1100 * (i + rand_x[x]) + (j + rand_y[x])] = pixel;
+							buffer[map_x * (i + rand_y[x]) + (j + rand_x[x])] = pixel;
 					}
 				}
 			}
@@ -462,7 +470,7 @@ int main()
 					uint8_t b = medium[0][28 * 4 * i + 4 * j];
 					uint32_t pixel = (r << 16) | (g << 8) | b;
 					if (pixel)
-						buffer[1100 * (i + rand_x[4]) + (j + rand_y[4])] = pixel;
+						buffer[map_x * (i + rand_y[4]) + (j + rand_x[4])] = pixel;
 				}
 			}
 		}
@@ -478,7 +486,7 @@ int main()
 						uint8_t b = easy[x][28 * 4 * i + 4 * j];
 						uint32_t pixel = (r << 16) | (g << 8) | b;
 						if (pixel)
-							buffer[1100 * (i + rand_x[x]) + (j + rand_y[x])] = pixel;
+							buffer[map_x * (i + rand_y[x]) + (j + rand_x[x])] = pixel;
 					}
 				}
 			}
@@ -492,7 +500,7 @@ int main()
 						uint8_t b = medium[x][28 * 4 * i + 4 * j];
 						uint32_t pixel = (r << 16) | (g << 8) | b;
 						if (pixel)
-							buffer[1100 * (i + rand_x[x+3]) + (j + rand_y[x+3])] = pixel;
+							buffer[map_x * (i + rand_y[x + 3]) + (j + rand_x[x + 3])] = pixel;
 					}
 				}
 			}
@@ -506,7 +514,7 @@ int main()
 					uint8_t b = hard[0][28 * 4 * i + 4 * j];
 					uint32_t pixel = (r << 16) | (g << 8) | b;
 					if (pixel)
-						buffer[1100 * (i + rand_x[6]) + (j + rand_y[6])] = pixel;
+						buffer[map_x * (i + rand_y[6]) + (j + rand_x[6])] = pixel;
 				}
 			}
 		}
@@ -522,7 +530,7 @@ int main()
 						uint8_t b = easy[x][28 * 4 * i + 4 * j];
 						uint32_t pixel = (r << 16) | (g << 8) | b;
 						if (pixel)
-							buffer[1100 * (i + rand_x[x]) + (j + rand_y[x])] = pixel;
+							buffer[map_x * (i + rand_y[x]) + (j + rand_x[x])] = pixel;
 					}
 				}
 			}
@@ -536,7 +544,7 @@ int main()
 						uint8_t b = medium[x][28 * 4 * i + 4 * j];
 						uint32_t pixel = (r << 16) | (g << 8) | b;
 						if (pixel)
-							buffer[1100 * (i + rand_x[x + 2]) + (j + rand_y[x + 2])] = pixel;
+							buffer[map_x * (i + rand_y[x + 2]) + (j + rand_x[x + 2])] = pixel;
 					}
 				}
 			}
@@ -550,7 +558,7 @@ int main()
 						uint8_t b = hard[x][28 * 4 * i + 4 * j];
 						uint32_t pixel = (r << 16) | (g << 8) | b;
 						if (pixel)
-							buffer[1100 * (i + rand_x[x + 6]) + (j + rand_y[x + 6])] = pixel;
+							buffer[map_x * (i + rand_y[x + 6]) + (j + rand_x[x + 6])] = pixel;
 					}
 				}
 			}
@@ -565,7 +573,7 @@ int main()
 		//	map_ctr = 1;
 		//	//map_ctr = 0;
 		//}
-
+		
 		printf("bg_x = %d\n", bg_x);
 		printf("bg_y = %d\n\n", bg_y);
 
@@ -585,24 +593,40 @@ int main()
 	return 0;
 }
 
+int generate_RandomX()
+{
+	int num;
+	//num = rand() % 1100; // should be less than map size - 30 (width of rat) 750
+	num = (rand() % (1127 - 177 + 1)) + 177;
+	return num;
+}
+
+int generate_RandomY()
+{
+	int num;
+	//num = rand() % 1000; // should be less than map size - 30 (height of rat) 690
+	num = (rand() % (967 - 407 + 1)) + 407;
+	return num;
+}
+
 void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isPressed)
 {
 	static int type_i = 0;
 	static int heavyattack_i = 0;
 	static int specialattack_i = 0;
-	user_data* udata = (user_data*)mfb_get_user_data(window);
+	user_data* udata = (user_data *)mfb_get_user_data(window);
 	if (isPressed)
 	{
 		//MAPS
 		if (key == KB_KEY_N) {
-			*(udata->map_x) = 1100;
-			*(udata->map_y) = 833;
+			*(udata->map_x) = 1436;
+			*(udata->map_y) = 1293;
 			//*(udata->map_change) = 0;
 			*(udata->m) = 0;
 			*(udata->map_ctr) += 1;
 			printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
 		}
-
+		
 		if (key == KB_KEY_M) {
 			*(udata->map_x) = 988;
 			*(udata->map_y) = 1062;
@@ -807,18 +831,4 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		//else if (*(udata->y) >= (*(mdata->map_y))) //bottom border
 		//	*(udata->y) = (*(mdata->map_y));
 	}
-}
-
-int generate_RandomX()
-{
-	int num;
-	num = rand() % 700; // should be less than map size - 30 (width of rat)
-	return num;
-}
-
-int generate_RandomY()
-{
-	int num;
-	num = rand() % 400; // should be less than map size - 30 (height of rat)
-	return num;
 }
