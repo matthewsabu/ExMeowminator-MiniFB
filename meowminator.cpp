@@ -1,28 +1,38 @@
+#include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "include/MiniFB_cpp.h"
 #include "include/MiniFB.h"
 #include "include/FreeImage.h"
 
 void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isPressed);
+int generate_RandomX();
+int generate_RandomY();
 
 typedef struct
 {
-	int *x;
-	int *x_old;
-	int *y;
-	int *y_old;
-	int *s;
+	int* x;
+	int* x_old;
+	int* y;
+	int* y_old;
+	int* s;
 
-	int *map_x; 
-	int *map_y; 
+	int* map_x;
+	int* map_y;
 	//int *map_change;
-	int *m;
-	int *map_ctr;
+	int* m;
+	int* map_ctr;
 
 	int* a;
 	int* dir;
 	int* cat_type;
 } user_data;
+
+int randomizer = 1; // RANDOMIZE ONCE ONLY
+int rand_xnum = 0;
+int rand_ynum = 0;
+int rand_x[10] = {};
+int rand_y[10] = {};
 
 int main()
 {
@@ -165,15 +175,65 @@ int main()
 	uint8_t* taser_attack = FreeImage_GetBits(fi_sprite30);
 
 	FIBITMAP* fi_sprite31 = FreeImage_Load(FIF_PNG, "assets_meow/Sword_Attack.png");
-	FreeImage_FlipVertical(fi_sprite30);
+	FreeImage_FlipVertical(fi_sprite31);
 	uint8_t* sword_attack = FreeImage_GetBits(fi_sprite31);
+
+	FIBITMAP* fi_sprite32 = FreeImage_Load(FIF_PNG, "assets_meow/Easy_Up.png");
+	FreeImage_FlipVertical(fi_sprite32);
+	uint8_t* sprite32 = FreeImage_GetBits(fi_sprite32);
+
+	FIBITMAP* fi_sprite33 = FreeImage_Load(FIF_PNG, "assets_meow/Easy_Down.png");
+	FreeImage_FlipVertical(fi_sprite33);
+	uint8_t* sprite33 = FreeImage_GetBits(fi_sprite33);
+
+	FIBITMAP* fi_sprite34 = FreeImage_Load(FIF_PNG, "assets_meow/Easy_Left.png");
+	FreeImage_FlipVertical(fi_sprite34);
+	uint8_t* sprite34 = FreeImage_GetBits(fi_sprite34);
+
+	FIBITMAP* fi_sprite35 = FreeImage_Load(FIF_PNG, "assets_meow/Easy_Right.png");
+	FreeImage_FlipVertical(fi_sprite35);
+	uint8_t* sprite35 = FreeImage_GetBits(fi_sprite35);
+
+	FIBITMAP* fi_sprite36 = FreeImage_Load(FIF_PNG, "assets_meow/Medium_Up.png");
+	FreeImage_FlipVertical(fi_sprite36);
+	uint8_t* sprite36 = FreeImage_GetBits(fi_sprite36);
+
+	FIBITMAP* fi_sprite37 = FreeImage_Load(FIF_PNG, "assets_meow/Medium_Down.png");
+	FreeImage_FlipVertical(fi_sprite37);
+	uint8_t* sprite37 = FreeImage_GetBits(fi_sprite37);
+
+	FIBITMAP* fi_sprite38 = FreeImage_Load(FIF_PNG, "assets_meow/Medium_Left.png");
+	FreeImage_FlipVertical(fi_sprite38);
+	uint8_t* sprite38 = FreeImage_GetBits(fi_sprite38);
+
+	FIBITMAP* fi_sprite39 = FreeImage_Load(FIF_PNG, "assets_meow/Medium_Right.png");
+	FreeImage_FlipVertical(fi_sprite39);
+	uint8_t* sprite39 = FreeImage_GetBits(fi_sprite39);
+
+	FIBITMAP* fi_sprite40 = FreeImage_Load(FIF_PNG, "assets_meow/Hard_Up.png");
+	FreeImage_FlipVertical(fi_sprite40);
+	uint8_t* sprite40 = FreeImage_GetBits(fi_sprite40);
+
+	FIBITMAP* fi_sprite41 = FreeImage_Load(FIF_PNG, "assets_meow/Hard_Down.png");
+	FreeImage_FlipVertical(fi_sprite41);
+	uint8_t* sprite41 = FreeImage_GetBits(fi_sprite41);
+
+	FIBITMAP* fi_sprite42 = FreeImage_Load(FIF_PNG, "assets_meow/Hard_Left.png");
+	FreeImage_FlipVertical(fi_sprite42);
+	uint8_t* sprite42 = FreeImage_GetBits(fi_sprite42);
+
+	FIBITMAP* fi_sprite43 = FreeImage_Load(FIF_PNG, "assets_meow/Hard_Right.png");
+	FreeImage_FlipVertical(fi_sprite43);
+	uint8_t* sprite43 = FreeImage_GetBits(fi_sprite43);
 
 	//// Copies the full background to the framebuffer
 	//for (int i = 0; i < map_x *  map_y * 3; i += 3)
 	//	buffer[i / 3] = (bg2[i + 2] << 16) | (bg2[i + 1] << 8) | bg2[i];
 
 	mfb_set_keyboard_callback(window, key_press);
-	mfb_set_user_data(window, (void *)& udata);
+	mfb_set_user_data(window, (void*)&udata);
+
+	srand(time(0));
 
 	do {
 		static int map_x = 1100; //988
@@ -189,7 +249,7 @@ int main()
 		//udata.map_change = &map_change;
 		udata.m = &m;
 		udata.map_ctr = &map_ctr;
-		
+
 		// Copies the full background to the framebuffer
 		//if (map_change == 0) {
 		//	if (map_ctr > 0 && map_ctr < 2) {
@@ -224,7 +284,7 @@ int main()
 
 		for (int i = 0; i < map_x * map_y * 3; i += 3)
 			buffer[i / 3] = (maps[m][i + 2] << 16) | (maps[m][i + 1] << 8) | maps[m][i];
-		
+
 		static int bg_x = 0;
 		static int bg_y = 0;
 		static int bg_x_old = bg_x;
@@ -233,8 +293,12 @@ int main()
 		static int a = 0;
 		static int dir = 1;
 		static int cat_type = 1;
+		int wave = 3; // change to test wave 1, wave 2, wave 3
 		uint8_t* sprites[20] = { sprite2, sprite3, sprite4, sprite5, sprite6, sprite7, sprite8, sprite9, sprite10, sprite11, sprite12, sprite13, sprite14, sprite15, sprite16, sprite17, sprite18, sprite19, sprite20, sprite21 };
 		uint8_t* attacks[12] = { NoAttack , light_attack, bite, furball_spit, mega_meow, tail_slap, telekinesis, flamethrower_attack, taser_attack, sword_attack };
+		uint8_t* easy[4] = { sprite32, sprite33, sprite34, sprite35 };
+		uint8_t* medium[4] = { sprite36, sprite37, sprite38, sprite39 };
+		uint8_t* hard[4] = { sprite40, sprite41, sprite42, sprite43 };
 
 		udata.x = &bg_x;
 		udata.x_old = &bg_x_old;
@@ -344,6 +408,154 @@ int main()
 			}
 		}
 
+		if (randomizer) {
+			for (int i = 0; i < 10; i++)
+			{
+				rand_xnum = generate_RandomX();
+				for (int j = 0; j < 10; j++)
+				{
+					if ((rand_x[j] >= rand_xnum) && (rand_xnum <= rand_x[j] + 30)) {
+						rand_xnum = generate_RandomX();
+					}
+					else {
+						rand_x[i] = rand_xnum;
+					}
+				}
+			}
+			for (int i = 0; i < 10; i++)
+			{
+				rand_ynum = generate_RandomY();
+				for (int j = 0; j < 10; j++) {
+					if ((rand_y[j] >= rand_ynum) && (rand_ynum <= rand_y[j] + 30)) {
+						rand_ynum = generate_RandomY();
+					}
+					else {
+						rand_y[i] = rand_ynum;
+					}
+				}
+			}
+			randomizer = 0; // set randomizer 1 again after wave is done
+		}
+
+		if (wave == 1) { // first wave, 5 rats
+			for (int x = 0; x < 4; x++) { // 4 easy
+				for (int i = 0; i < 22; i++)
+				{
+					for (int j = 0; j < 28; j++)
+					{
+						uint8_t r = easy[x][28 * 4 * i + 4 * j + 2];
+						uint8_t g = easy[x][28 * 4 * i + 4 * j + 1];
+						uint8_t b = easy[x][28 * 4 * i + 4 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[1100 * (i + rand_x[x]) + (j + rand_y[x])] = pixel;
+					}
+				}
+			}
+			// 1 medium
+			for (int i = 0; i < 22; i++)
+			{
+				for (int j = 0; j < 28; j++)
+				{
+					uint8_t r = medium[0][28 * 4 * i + 4 * j + 2];
+					uint8_t g = medium[0][28 * 4 * i + 4 * j + 1];
+					uint8_t b = medium[0][28 * 4 * i + 4 * j];
+					uint32_t pixel = (r << 16) | (g << 8) | b;
+					if (pixel)
+						buffer[1100 * (i + rand_x[4]) + (j + rand_y[4])] = pixel;
+				}
+			}
+		}
+
+		if (wave == 2) { // second wave, 7 rats
+			for (int x = 0; x < 3; x++) { // 3 easy
+				for (int i = 0; i < 22; i++)
+				{
+					for (int j = 0; j < 28; j++)
+					{
+						uint8_t r = easy[x][28 * 4 * i + 4 * j + 2];
+						uint8_t g = easy[x][28 * 4 * i + 4 * j + 1];
+						uint8_t b = easy[x][28 * 4 * i + 4 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[1100 * (i + rand_x[x]) + (j + rand_y[x])] = pixel;
+					}
+				}
+			}
+			for (int x = 0; x < 3; x++) { // 3 medium
+				for (int i = 0; i < 22; i++)
+				{
+					for (int j = 0; j < 28; j++)
+					{
+						uint8_t r = medium[x][28 * 4 * i + 4 * j + 2];
+						uint8_t g = medium[x][28 * 4 * i + 4 * j + 1];
+						uint8_t b = medium[x][28 * 4 * i + 4 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[1100 * (i + rand_x[x+3]) + (j + rand_y[x+3])] = pixel;
+					}
+				}
+			}
+			// 1 hard
+			for (int i = 0; i < 22; i++)
+			{
+				for (int j = 0; j < 28; j++)
+				{
+					uint8_t r = hard[0][28 * 4 * i + 4 * j + 2];
+					uint8_t g = hard[0][28 * 4 * i + 4 * j + 1];
+					uint8_t b = hard[0][28 * 4 * i + 4 * j];
+					uint32_t pixel = (r << 16) | (g << 8) | b;
+					if (pixel)
+						buffer[1100 * (i + rand_x[6]) + (j + rand_y[6])] = pixel;
+				}
+			}
+		}
+
+		if (wave == 3) { // third wave, 10 rats
+			for (int x = 0; x < 2; x++) { // 2 easy
+				for (int i = 0; i < 22; i++)
+				{
+					for (int j = 0; j < 28; j++)
+					{
+						uint8_t r = easy[x][28 * 4 * i + 4 * j + 2];
+						uint8_t g = easy[x][28 * 4 * i + 4 * j + 1];
+						uint8_t b = easy[x][28 * 4 * i + 4 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[1100 * (i + rand_x[x]) + (j + rand_y[x])] = pixel;
+					}
+				}
+			}
+			for (int x = 0; x < 4; x++) { // 4 medium
+				for (int i = 0; i < 22; i++)
+				{
+					for (int j = 0; j < 28; j++)
+					{
+						uint8_t r = medium[x][28 * 4 * i + 4 * j + 2];
+						uint8_t g = medium[x][28 * 4 * i + 4 * j + 1];
+						uint8_t b = medium[x][28 * 4 * i + 4 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[1100 * (i + rand_x[x + 2]) + (j + rand_y[x + 2])] = pixel;
+					}
+				}
+			}
+			for (int x = 0; x < 4; x++) { // 4 hard
+				for (int i = 0; i < 22; i++)
+				{
+					for (int j = 0; j < 28; j++)
+					{
+						uint8_t r = hard[x][28 * 4 * i + 4 * j + 2];
+						uint8_t g = hard[x][28 * 4 * i + 4 * j + 1];
+						uint8_t b = hard[x][28 * 4 * i + 4 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[1100 * (i + rand_x[x + 6]) + (j + rand_y[x + 6])] = pixel;
+					}
+				}
+			}
+		}
+
 		////will overload ur memory thats 
 		////why key press to change maps nlg
 		//if (bg_x > 100 && bg_y > 100) {
@@ -353,7 +565,7 @@ int main()
 		//	map_ctr = 1;
 		//	//map_ctr = 0;
 		//}
-		
+
 		printf("bg_x = %d\n", bg_x);
 		printf("bg_y = %d\n\n", bg_y);
 
@@ -378,7 +590,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 	static int type_i = 0;
 	static int heavyattack_i = 0;
 	static int specialattack_i = 0;
-	user_data* udata = (user_data *)mfb_get_user_data(window);
+	user_data* udata = (user_data*)mfb_get_user_data(window);
 	if (isPressed)
 	{
 		//MAPS
@@ -390,7 +602,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			*(udata->map_ctr) += 1;
 			printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
 		}
-		
+
 		if (key == KB_KEY_M) {
 			*(udata->map_x) = 988;
 			*(udata->map_y) = 1062;
@@ -595,4 +807,18 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		//else if (*(udata->y) >= (*(mdata->map_y))) //bottom border
 		//	*(udata->y) = (*(mdata->map_y));
 	}
+}
+
+int generate_RandomX()
+{
+	int num;
+	num = rand() % 700; // should be less than map size - 30 (width of rat)
+	return num;
+}
+
+int generate_RandomY()
+{
+	int num;
+	num = rand() % 400; // should be less than map size - 30 (height of rat)
+	return num;
 }
