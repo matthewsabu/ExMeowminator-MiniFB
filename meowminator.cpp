@@ -17,6 +17,11 @@ typedef struct
 	int *y_old;
 	int *s;
 
+	int *game_mode; 
+	int *ub;
+	int *ub_x_off;
+	int *ub_y_off;
+
 	int *map_x; 
 	int *map_y; 
 	//int *map_change;
@@ -44,17 +49,25 @@ int main()
 
 	user_data udata;
 
-	uint32_t* buffer = (uint32_t*)malloc(1436 * 1293 * 4);
+	uint32_t* buffer = (uint32_t*)malloc(800 * 600 * 4);  //1436 | 1293
 
-	//FIBITMAP* fi_bg = FreeImage_Load(FIF_JPEG, "assets/bg.jpg");
-	//FreeImage_FlipVertical(fi_bg);
-	//uint8_t* bg = FreeImage_GetBits(fi_bg);
+	FIBITMAP* fi_ui1 = FreeImage_Load(FIF_JPEG, "assets_meow/Main_Menu.jpg");
+	FreeImage_FlipVertical(fi_ui1);
+	uint8_t* ui1 = FreeImage_GetBits(fi_ui1);
 
-	FIBITMAP* fi_bg1 = FreeImage_Load(FIF_JPEG, "assets_meow/f2_bedroom_new2.jpg");
+	FIBITMAP* fi_ui_btn1 = FreeImage_Load(FIF_PNG, "assets_meow/Main_Start.png");
+	FreeImage_FlipVertical(fi_ui_btn1);
+	uint8_t* ui_btn1 = FreeImage_GetBits(fi_ui_btn1);
+
+	FIBITMAP* fi_ui_btn2 = FreeImage_Load(FIF_PNG, "assets_meow/Main_Upgrades.png");
+	FreeImage_FlipVertical(fi_ui_btn2);
+	uint8_t* ui_btn2 = FreeImage_GetBits(fi_ui_btn2);
+
+	FIBITMAP* fi_bg1 = FreeImage_Load(FIF_JPEG, "assets_meow/F2_Bedroom.jpg");
 	FreeImage_FlipVertical(fi_bg1);
 	uint8_t* bg1 = FreeImage_GetBits(fi_bg1);
 
-	FIBITMAP* fi_bg2 = FreeImage_Load(FIF_JPEG, "assets_meow/f3_bathroom.jpg");
+	FIBITMAP* fi_bg2 = FreeImage_Load(FIF_JPEG, "assets_meow/F3_Bathroom.jpg");
 	FreeImage_FlipVertical(fi_bg2);
 	uint8_t* bg2 = FreeImage_GetBits(fi_bg2);
 
@@ -236,13 +249,13 @@ int main()
 	srand(time(0));
 
 	do {
-		static int map_x = 1436; //988
-		static int map_y = 1293; //1062
+		static int map_x = 800; //1436
+		static int map_y = 600; //1293
 		//static int map_change = 0;
 		static int m = 0;
 		static int map_ctr = 0;
 
-		uint8_t* maps[2] = { bg1, bg2 };
+		uint8_t* maps[3] = { ui1, bg1, bg2 };
 
 		udata.map_x = &map_x;
 		udata.map_y = &map_y;
@@ -293,12 +306,17 @@ int main()
 		static int a = 0;
 		static int dir = 1;
 		static int cat_type = 1;
-		int wave = 3; // change to test wave 1, wave 2, wave 3
+		static int game_mode = 0;
+		static int ub = 0;
+		static int ub_x_off = 0;
+		static int ub_y_off = 247;
+		static int wave = 3; // change to test wave 1, wave 2, wave 3
 		uint8_t* sprites[20] = { sprite2, sprite3, sprite4, sprite5, sprite6, sprite7, sprite8, sprite9, sprite10, sprite11, sprite12, sprite13, sprite14, sprite15, sprite16, sprite17, sprite18, sprite19, sprite20, sprite21 };
 		uint8_t* attacks[12] = { NoAttack , light_attack, bite, furball_spit, mega_meow, tail_slap, telekinesis, flamethrower_attack, taser_attack, sword_attack };
 		uint8_t* easy[4] = { sprite32, sprite33, sprite34, sprite35 };
 		uint8_t* medium[4] = { sprite36, sprite37, sprite38, sprite39 };
 		uint8_t* hard[4] = { sprite40, sprite41, sprite42, sprite43 };
+		uint8_t* ui_btns[2] = { ui_btn1, ui_btn2 };
 
 		udata.x = &bg_x;
 		udata.x_old = &bg_x_old;
@@ -311,258 +329,299 @@ int main()
 		udata.a = &a;
 		udata.dir = &dir;
 		udata.cat_type = &cat_type;
+		
+		udata.game_mode = &game_mode;
+		udata.ub = &ub;
+		udata.ub_x_off = &ub_x_off;
+		udata.ub_y_off = &ub_y_off;
 
-		// Redraw the background 
-		// 10k pixels
-		for (int i = 0; i < 30; i++)
-		{
-			for (int j = 0; j < 42; j++)
+		if (game_mode == 0) {
+			// Redraw the background 
+					// 10k pixels
+			for (int i = 0; i < 106; i++)
 			{
-				uint8_t r = maps[m][map_x * 3 * (i + bg_y_old + 277) + 3 * (bg_x_old + j + 377) + 2];
-				uint8_t g = maps[m][map_x * 3 * (i + bg_y_old + 277) + 3 * (bg_x_old + j + 377) + 1];
-				uint8_t b = maps[m][map_x * 3 * (i + bg_y_old + 277) + 3 * (bg_x_old + j + 377)];
-				uint32_t pixel = (r << 16) | (g << 8) | b;
-				if (pixel)
-					buffer[map_x * (i + bg_y_old + 277) + (j + bg_x_old + 377)] = pixel; //-- CENTER
+				for (int j = 0; j < 456; j++)
+				{
+					uint8_t r = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 24) + 3 * (bg_x_old + j + 172) + 2];
+					uint8_t g = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 24) + 3 * (bg_x_old + j + 172) + 1];
+					uint8_t b = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 24) + 3 * (bg_x_old + j + 172)];
+					uint32_t pixel = (r << 16) | (g << 8) | b;
+					if (pixel)
+						buffer[map_x * (i + bg_y_old + ub_y_off + 24) + (j + bg_x_old + 172)] = pixel; //-- CENTER
+				}
 			}
-		}
 
-		// Change sprite used depending on direction
-		// Draws the sprite over the background in the framebuffer
-		// 10k pixels
-		for (int i = 0; i < 30; i++)
-		{
-			for (int j = 0; j < 42; j++)
-			{
-				uint8_t r = sprites[s][42 * 4 * i + 4 * j + 2];
-				uint8_t g = sprites[s][42 * 4 * i + 4 * j + 1];
-				uint8_t b = sprites[s][42 * 4 * i + 4 * j];
-				uint32_t pixel = (r << 16) | (g << 8) | b;
-				if (pixel)
-					buffer[map_x * (i + bg_y + 277) + (j + bg_x + 377)] = pixel; //-- CENTER
-			}
-		}
-
-		if (dir == 3) {
-			// Draws the attack over the background in the framebuffer
+			// Change sprite used depending on direction
+			// Draws the sprite over the background in the framebuffer
 			// 10k pixels
-			for (int i = 0; i < 20; i++)
+			for (int i = 0; i < 106; i++)
 			{
-				for (int j = 0; j < 20; j++)
+				for (int j = 0; j < 456; j++)
 				{
-					uint8_t r = attacks[a][20 * 4 * i + 4 * j + 2];
-					uint8_t g = attacks[a][20 * 4 * i + 4 * j + 1];
-					uint8_t b = attacks[a][20 * 4 * i + 4 * j];
+					uint8_t r = ui_btns[ub][456 * 3 * i + 3 * j + 2];
+					uint8_t g = ui_btns[ub][456 * 3 * i + 3 * j + 1];
+					uint8_t b = ui_btns[ub][456 * 3 * i + 3 * j];
 					uint32_t pixel = (r << 16) | (g << 8) | b;
 					if (pixel)
-						buffer[map_x * (i + bg_y + 284) + (j + bg_x + 419)] = pixel; //-- RIGHT
+						buffer[map_x * (i + bg_y + ub_y_off + 24) + (j + bg_x + 172)] = pixel; //-- CENTER
 				}
 			}
-		}
-		else if (dir == 2) {
-			// Draws the attack over the background in the framebuffer
+		}	
+		//start playing the game
+		else { 
+			// Redraw the background 
 			// 10k pixels
-			for (int i = 0; i < 20; i++)
+			for (int i = 0; i < 30; i++)
 			{
-				for (int j = 0; j < 20; j++)
+				for (int j = 0; j < 42; j++)
 				{
-					uint8_t r = attacks[a][20 * 4 * i + 4 * j + 2];
-					uint8_t g = attacks[a][20 * 4 * i + 4 * j + 1];
-					uint8_t b = attacks[a][20 * 4 * i + 4 * j];
+					uint8_t r = maps[m][map_x * 3 * (i + bg_y_old + 277) + 3 * (bg_x_old + j + 377) + 2];
+					uint8_t g = maps[m][map_x * 3 * (i + bg_y_old + 277) + 3 * (bg_x_old + j + 377) + 1];
+					uint8_t b = maps[m][map_x * 3 * (i + bg_y_old + 277) + 3 * (bg_x_old + j + 377)];
 					uint32_t pixel = (r << 16) | (g << 8) | b;
 					if (pixel)
-						buffer[map_x * (i + bg_y + 284) + (j + bg_x + 357)] = pixel; //-- LEFT
+						buffer[map_x * (i + bg_y_old + 277) + (j + bg_x_old + 377)] = pixel; //-- CENTER
 				}
 			}
-		}
-		else if (dir == 1) {
-			// Draws the attack over the background in the framebuffer
+
+			// Change sprite used depending on direction
+			// Draws the sprite over the background in the framebuffer
 			// 10k pixels
-			for (int i = 0; i < 20; i++)
+			for (int i = 0; i < 30; i++)
 			{
-				for (int j = 0; j < 20; j++)
+				for (int j = 0; j < 42; j++)
 				{
-					uint8_t r = attacks[a][20 * 4 * i + 4 * j + 2];
-					uint8_t g = attacks[a][20 * 4 * i + 4 * j + 1];
-					uint8_t b = attacks[a][20 * 4 * i + 4 * j];
+					uint8_t r = sprites[s][42 * 4 * i + 4 * j + 2];
+					uint8_t g = sprites[s][42 * 4 * i + 4 * j + 1];
+					uint8_t b = sprites[s][42 * 4 * i + 4 * j];
 					uint32_t pixel = (r << 16) | (g << 8) | b;
 					if (pixel)
-						buffer[map_x * (i + bg_y + 312) + (j + bg_x + 388)] = pixel; //-- DOWN
+						buffer[map_x * (i + bg_y + 277) + (j + bg_x + 377)] = pixel; //-- CENTER
 				}
 			}
-		}
-		else if (dir == 0) {
-			// Draws the attack over the background in the framebuffer
-			// 10k pixels
-			for (int i = 0; i < 20; i++)
-			{
-				for (int j = 0; j < 20; j++)
+
+			if (dir == 3) {
+				// Draws the attack over the background in the framebuffer
+				// 10k pixels
+				for (int i = 0; i < 20; i++)
 				{
-					uint8_t r = attacks[a][20 * 4 * i + 4 * j + 2];
-					uint8_t g = attacks[a][20 * 4 * i + 4 * j + 1];
-					uint8_t b = attacks[a][20 * 4 * i + 4 * j];
-					uint32_t pixel = (r << 16) | (g << 8) | b;
-					if (pixel)
-						buffer[map_x * (i + bg_y + 258) + (j + bg_x + 388)] = pixel; //-- UP
+					for (int j = 0; j < 20; j++)
+					{
+						uint8_t r = attacks[a][20 * 4 * i + 4 * j + 2];
+						uint8_t g = attacks[a][20 * 4 * i + 4 * j + 1];
+						uint8_t b = attacks[a][20 * 4 * i + 4 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[map_x * (i + bg_y + 284) + (j + bg_x + 419)] = pixel; //-- RIGHT
+					}
 				}
 			}
-		}
-
-		if (randomizer) {
-			for (int i = 0; i < 10; i++)
-			{
-				rand_xnum = generate_RandomX();
-				for (int j = 0; j < 10; j++)
+			else if (dir == 2) {
+				// Draws the attack over the background in the framebuffer
+				// 10k pixels
+				for (int i = 0; i < 20; i++)
 				{
-					if ((rand_x[j] >= rand_xnum) && (rand_xnum <= rand_x[j] + 30)) {
-						rand_xnum = generate_RandomX();
-					}
-					else {
-						rand_x[i] = rand_xnum;
-					}
-				}
-			}
-			for (int i = 0; i < 10; i++)
-			{
-				rand_ynum = generate_RandomY();
-				for (int j = 0; j < 10; j++) {
-					if ((rand_y[j] >= rand_ynum) && (rand_ynum <= rand_y[j] + 30)) {
-						rand_ynum = generate_RandomY();
-					}
-					else {
-						rand_y[i] = rand_ynum;
+					for (int j = 0; j < 20; j++)
+					{
+						uint8_t r = attacks[a][20 * 4 * i + 4 * j + 2];
+						uint8_t g = attacks[a][20 * 4 * i + 4 * j + 1];
+						uint8_t b = attacks[a][20 * 4 * i + 4 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[map_x * (i + bg_y + 284) + (j + bg_x + 357)] = pixel; //-- LEFT
 					}
 				}
 			}
-			randomizer = 0; // set randomizer 1 again after wave is done
-		}
+			else if (dir == 1) {
+				// Draws the attack over the background in the framebuffer
+				// 10k pixels
+				for (int i = 0; i < 20; i++)
+				{
+					for (int j = 0; j < 20; j++)
+					{
+						uint8_t r = attacks[a][20 * 4 * i + 4 * j + 2];
+						uint8_t g = attacks[a][20 * 4 * i + 4 * j + 1];
+						uint8_t b = attacks[a][20 * 4 * i + 4 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[map_x * (i + bg_y + 312) + (j + bg_x + 388)] = pixel; //-- DOWN
+					}
+				}
+			}
+			else if (dir == 0) {
+				// Draws the attack over the background in the framebuffer
+				// 10k pixels
+				for (int i = 0; i < 20; i++)
+				{
+					for (int j = 0; j < 20; j++)
+					{
+						uint8_t r = attacks[a][20 * 4 * i + 4 * j + 2];
+						uint8_t g = attacks[a][20 * 4 * i + 4 * j + 1];
+						uint8_t b = attacks[a][20 * 4 * i + 4 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[map_x * (i + bg_y + 258) + (j + bg_x + 388)] = pixel; //-- UP
+					}
+				}
+			}
+			
+			if (randomizer) {
+				for (int i = 0; i < 10; i++)
+				{
+					rand_xnum = generate_RandomX();
+					for (int j = 0; j < 10; j++)
+					{
+						if ((rand_x[j] >= rand_xnum) && (rand_xnum <= rand_x[j] + 30)) {
+							rand_xnum = generate_RandomX();
+						}
+						else {
+							rand_x[i] = rand_xnum;
+						}
+					}
+				}
+				for (int i = 0; i < 10; i++)
+				{
+					rand_ynum = generate_RandomY();
+					for (int j = 0; j < 10; j++) {
+						if ((rand_y[j] >= rand_ynum) && (rand_ynum <= rand_y[j] + 30)) {
+							rand_ynum = generate_RandomY();
+						}
+						else {
+							rand_y[i] = rand_ynum;
+						}
+					}
+				}
+				randomizer = 0; // set randomizer 1 again after wave is done
+			}
 
-		for (int i = 0; i < 10; i++) {
-			printf("X [%d] = %d\n", i, rand_x[i]);
-		}
+			//for (int i = 0; i < 10; i++) {
+			//	printf("X [%d] = %d\n", i, rand_x[i]);
+			//}
+			//for (int j = 0; j < 10; j++) {
+			//	printf("Y [%d] = %d\n", j, rand_y[j]);
+			//}
 
-		for (int j = 0; j < 10; j++) {
-			printf("Y [%d] = %d\n", j, rand_y[j]);
-		}
-
-		if (wave == 1) { // first wave, 5 rats
-			for (int x = 0; x < 4; x++) { // 4 easy
+			if (wave == 1) { // first wave, 5 rats
+				for (int x = 0; x < 4; x++) { // 4 easy
+					for (int i = 0; i < 22; i++)
+					{
+						for (int j = 0; j < 28; j++)
+						{
+							uint8_t r = easy[x][28 * 4 * i + 4 * j + 2];
+							uint8_t g = easy[x][28 * 4 * i + 4 * j + 1];
+							uint8_t b = easy[x][28 * 4 * i + 4 * j];
+							uint32_t pixel = (r << 16) | (g << 8) | b;
+							if (pixel)
+								buffer[map_x * (i + rand_y[x]) + (j + rand_x[x])] = pixel;
+						}
+					}
+				}
+				// 1 medium
 				for (int i = 0; i < 22; i++)
 				{
 					for (int j = 0; j < 28; j++)
 					{
-						uint8_t r = easy[x][28 * 4 * i + 4 * j + 2];
-						uint8_t g = easy[x][28 * 4 * i + 4 * j + 1];
-						uint8_t b = easy[x][28 * 4 * i + 4 * j];
+						uint8_t r = medium[0][28 * 4 * i + 4 * j + 2];
+						uint8_t g = medium[0][28 * 4 * i + 4 * j + 1];
+						uint8_t b = medium[0][28 * 4 * i + 4 * j];
 						uint32_t pixel = (r << 16) | (g << 8) | b;
 						if (pixel)
-							buffer[map_x * (i + rand_y[x]) + (j + rand_x[x])] = pixel;
+							buffer[map_x * (i + rand_y[4]) + (j + rand_x[4])] = pixel;
 					}
 				}
 			}
-			// 1 medium
-			for (int i = 0; i < 22; i++)
-			{
-				for (int j = 0; j < 28; j++)
+
+			if (wave == 2) { // second wave, 7 rats
+				for (int x = 0; x < 3; x++) { // 3 easy
+					for (int i = 0; i < 22; i++)
+					{
+						for (int j = 0; j < 28; j++)
+						{
+							uint8_t r = easy[x][28 * 4 * i + 4 * j + 2];
+							uint8_t g = easy[x][28 * 4 * i + 4 * j + 1];
+							uint8_t b = easy[x][28 * 4 * i + 4 * j];
+							uint32_t pixel = (r << 16) | (g << 8) | b;
+							if (pixel)
+								buffer[map_x * (i + rand_y[x]) + (j + rand_x[x])] = pixel;
+						}
+					}
+				}
+				for (int x = 0; x < 3; x++) { // 3 medium
+					for (int i = 0; i < 22; i++)
+					{
+						for (int j = 0; j < 28; j++)
+						{
+							uint8_t r = medium[x][28 * 4 * i + 4 * j + 2];
+							uint8_t g = medium[x][28 * 4 * i + 4 * j + 1];
+							uint8_t b = medium[x][28 * 4 * i + 4 * j];
+							uint32_t pixel = (r << 16) | (g << 8) | b;
+							if (pixel)
+								buffer[map_x * (i + rand_y[x + 3]) + (j + rand_x[x + 3])] = pixel;
+						}
+					}
+				}
+				// 1 hard
+				for (int i = 0; i < 22; i++)
 				{
-					uint8_t r = medium[0][28 * 4 * i + 4 * j + 2];
-					uint8_t g = medium[0][28 * 4 * i + 4 * j + 1];
-					uint8_t b = medium[0][28 * 4 * i + 4 * j];
-					uint32_t pixel = (r << 16) | (g << 8) | b;
-					if (pixel)
-						buffer[map_x * (i + rand_y[4]) + (j + rand_x[4])] = pixel;
+					for (int j = 0; j < 28; j++)
+					{
+						uint8_t r = hard[0][28 * 4 * i + 4 * j + 2];
+						uint8_t g = hard[0][28 * 4 * i + 4 * j + 1];
+						uint8_t b = hard[0][28 * 4 * i + 4 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[map_x * (i + rand_y[6]) + (j + rand_x[6])] = pixel;
+					}
+				}
+			}
+
+			if (wave == 3) { // third wave, 10 rats
+				for (int x = 0; x < 2; x++) { // 2 easy
+					for (int i = 0; i < 22; i++)
+					{
+						for (int j = 0; j < 28; j++)
+						{
+							uint8_t r = easy[x][28 * 4 * i + 4 * j + 2];
+							uint8_t g = easy[x][28 * 4 * i + 4 * j + 1];
+							uint8_t b = easy[x][28 * 4 * i + 4 * j];
+							uint32_t pixel = (r << 16) | (g << 8) | b;
+							if (pixel)
+								buffer[map_x * (i + rand_y[x]) + (j + rand_x[x])] = pixel;
+						}
+					}
+				}
+				for (int x = 0; x < 4; x++) { // 4 medium
+					for (int i = 0; i < 22; i++)
+					{
+						for (int j = 0; j < 28; j++)
+						{
+							uint8_t r = medium[x][28 * 4 * i + 4 * j + 2];
+							uint8_t g = medium[x][28 * 4 * i + 4 * j + 1];
+							uint8_t b = medium[x][28 * 4 * i + 4 * j];
+							uint32_t pixel = (r << 16) | (g << 8) | b;
+							if (pixel)
+								buffer[map_x * (i + rand_y[x + 2]) + (j + rand_x[x + 2])] = pixel;
+						}
+					}
+				}
+				for (int x = 0; x < 4; x++) { // 4 hard
+					for (int i = 0; i < 22; i++)
+					{
+						for (int j = 0; j < 28; j++)
+						{
+							uint8_t r = hard[x][28 * 4 * i + 4 * j + 2];
+							uint8_t g = hard[x][28 * 4 * i + 4 * j + 1];
+							uint8_t b = hard[x][28 * 4 * i + 4 * j];
+							uint32_t pixel = (r << 16) | (g << 8) | b;
+							if (pixel)
+								buffer[map_x * (i + rand_y[x + 6]) + (j + rand_x[x + 6])] = pixel;
+						}
+					}
 				}
 			}
 		}
 
-		if (wave == 2) { // second wave, 7 rats
-			for (int x = 0; x < 3; x++) { // 3 easy
-				for (int i = 0; i < 22; i++)
-				{
-					for (int j = 0; j < 28; j++)
-					{
-						uint8_t r = easy[x][28 * 4 * i + 4 * j + 2];
-						uint8_t g = easy[x][28 * 4 * i + 4 * j + 1];
-						uint8_t b = easy[x][28 * 4 * i + 4 * j];
-						uint32_t pixel = (r << 16) | (g << 8) | b;
-						if (pixel)
-							buffer[map_x * (i + rand_y[x]) + (j + rand_x[x])] = pixel;
-					}
-				}
-			}
-			for (int x = 0; x < 3; x++) { // 3 medium
-				for (int i = 0; i < 22; i++)
-				{
-					for (int j = 0; j < 28; j++)
-					{
-						uint8_t r = medium[x][28 * 4 * i + 4 * j + 2];
-						uint8_t g = medium[x][28 * 4 * i + 4 * j + 1];
-						uint8_t b = medium[x][28 * 4 * i + 4 * j];
-						uint32_t pixel = (r << 16) | (g << 8) | b;
-						if (pixel)
-							buffer[map_x * (i + rand_y[x + 3]) + (j + rand_x[x + 3])] = pixel;
-					}
-				}
-			}
-			// 1 hard
-			for (int i = 0; i < 22; i++)
-			{
-				for (int j = 0; j < 28; j++)
-				{
-					uint8_t r = hard[0][28 * 4 * i + 4 * j + 2];
-					uint8_t g = hard[0][28 * 4 * i + 4 * j + 1];
-					uint8_t b = hard[0][28 * 4 * i + 4 * j];
-					uint32_t pixel = (r << 16) | (g << 8) | b;
-					if (pixel)
-						buffer[map_x * (i + rand_y[6]) + (j + rand_x[6])] = pixel;
-				}
-			}
-		}
-
-		if (wave == 3) { // third wave, 10 rats
-			for (int x = 0; x < 2; x++) { // 2 easy
-				for (int i = 0; i < 22; i++)
-				{
-					for (int j = 0; j < 28; j++)
-					{
-						uint8_t r = easy[x][28 * 4 * i + 4 * j + 2];
-						uint8_t g = easy[x][28 * 4 * i + 4 * j + 1];
-						uint8_t b = easy[x][28 * 4 * i + 4 * j];
-						uint32_t pixel = (r << 16) | (g << 8) | b;
-						if (pixel)
-							buffer[map_x * (i + rand_y[x]) + (j + rand_x[x])] = pixel;
-					}
-				}
-			}
-			for (int x = 0; x < 4; x++) { // 4 medium
-				for (int i = 0; i < 22; i++)
-				{
-					for (int j = 0; j < 28; j++)
-					{
-						uint8_t r = medium[x][28 * 4 * i + 4 * j + 2];
-						uint8_t g = medium[x][28 * 4 * i + 4 * j + 1];
-						uint8_t b = medium[x][28 * 4 * i + 4 * j];
-						uint32_t pixel = (r << 16) | (g << 8) | b;
-						if (pixel)
-							buffer[map_x * (i + rand_y[x + 2]) + (j + rand_x[x + 2])] = pixel;
-					}
-				}
-			}
-			for (int x = 0; x < 4; x++) { // 4 hard
-				for (int i = 0; i < 22; i++)
-				{
-					for (int j = 0; j < 28; j++)
-					{
-						uint8_t r = hard[x][28 * 4 * i + 4 * j + 2];
-						uint8_t g = hard[x][28 * 4 * i + 4 * j + 1];
-						uint8_t b = hard[x][28 * 4 * i + 4 * j];
-						uint32_t pixel = (r << 16) | (g << 8) | b;
-						if (pixel)
-							buffer[map_x * (i + rand_y[x + 6]) + (j + rand_x[x + 6])] = pixel;
-					}
-				}
-			}
-		}
+		
 
 		////will overload ur memory thats 
 		////why key press to change maps nlg
@@ -597,7 +656,7 @@ int generate_RandomX()
 {
 	int num;
 	//num = rand() % 1100; // should be less than map size - 30 (width of rat) 750
-	num = (rand() % (1127 - 177 + 1)) + 177;
+	num = (rand() % (1127 - 177 + 1)) + 177; // (upper - lower + 1) + lower;
 	return num;
 }
 
@@ -605,7 +664,7 @@ int generate_RandomY()
 {
 	int num;
 	//num = rand() % 1000; // should be less than map size - 30 (height of rat) 690
-	num = (rand() % (967 - 407 + 1)) + 407;
+	num = (rand() % (967 - 407 + 1)) + 407; // (upper - lower + 1) + lower;
 	return num;
 }
 
@@ -622,7 +681,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			*(udata->map_x) = 1436;
 			*(udata->map_y) = 1293;
 			//*(udata->map_change) = 0;
-			*(udata->m) = 0;
+			*(udata->m) = 1;
 			*(udata->map_ctr) += 1;
 			printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
 		}
@@ -631,47 +690,77 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			*(udata->map_x) = 988;
 			*(udata->map_y) = 1062;
 			//*(udata->map_change) = 1;
-			*(udata->m) = 1;
+			*(udata->m) = 2;
 			*(udata->map_ctr) += 1;
 			printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
+		}		
+
+		//Menu Keys
+		if (key == KB_KEY_ENTER) {
+			if (*(udata->game_mode) == 0) {
+				*(udata->map_x) = 1436;
+				*(udata->map_y) = 1293;
+				//*(udata->map_change) = 0;
+				*(udata->m) = 1;
+				*(udata->map_ctr) += 1;
+				printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
+				*(udata->game_mode) = 1;
+			}
 		}
 
 		//MOVEMENT
 		if (key == KB_KEY_LEFT)
 		{
-			*(udata->dir) = 2;
-			*(udata->x_old) = *(udata->x);
-			*(udata->x) -= 10;
-			*(udata->s) = 2 + type_i;
-			*(udata->a) = 0;
-			printf("Left\n");
+			if (*(udata->game_mode) == 1) {
+				*(udata->dir) = 2;
+				*(udata->x_old) = *(udata->x);
+				*(udata->x) -= 10;
+				*(udata->s) = 2 + type_i;
+				*(udata->a) = 0;
+				printf("Left\n");
+			}
 		}
 		else if (key == KB_KEY_RIGHT)
 		{
-			*(udata->dir) = 3;
-			*(udata->x_old) = *(udata->x);
-			*(udata->x) += 10;
-			*(udata->s) = 3 + type_i;
-			*(udata->a) = 0;
-			printf("Right\n");
+			if (*(udata->game_mode) == 1) {
+				*(udata->dir) = 3;
+				*(udata->x_old) = *(udata->x);
+				*(udata->x) += 10;
+				*(udata->s) = 3 + type_i;
+				*(udata->a) = 0;
+				printf("Right\n");
+			}
 		}
 		else if (key == KB_KEY_UP)
 		{
-			*(udata->dir) = 0;
-			*(udata->y_old) = *(udata->y);
-			*(udata->y) -= 10;
-			*(udata->s) = 0 + type_i;
-			*(udata->a) = 0;
-			printf("Up\n");
+			if (*(udata->game_mode) == 0) {
+				*(udata->ub_y_off) -= 118;
+				*(udata->ub) = 0;
+				printf("Up\n");
+			}
+			else {
+				*(udata->dir) = 0;
+				*(udata->y_old) = *(udata->y);
+				*(udata->y) -= 10;
+				*(udata->s) = 0 + type_i;
+				*(udata->a) = 0;
+				printf("Up\n");
+			}			
 		}
 		else if (key == KB_KEY_DOWN)
 		{
-			*(udata->dir) = 1;
-			*(udata->y_old) = *(udata->y);
-			*(udata->y) += 10;
-			*(udata->s) = 1 + type_i;
-			*(udata->a) = 0;
-			printf("Down\n");
+			if (*(udata->game_mode) == 0) {
+				*(udata->ub_y_off) += 118;
+				*(udata->ub) = 1;
+				printf("Down\n");
+			} else{
+				*(udata->dir) = 1;
+				*(udata->y_old) = *(udata->y);
+				*(udata->y) += 10;
+				*(udata->s) = 1 + type_i;
+				*(udata->a) = 0;
+				printf("Down\n");
+			}			
 		}
 
 		//Light Attack
@@ -821,14 +910,21 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			printf("Sword\n");
 		}
 
-		//if (*(udata->x) < -(*(mdata->map_x))) //left border
-		//	*(udata->x) = -(*(mdata->map_x));
-		//else if (*(udata->x) >= (*(mdata->map_x))) //right border
-		//	*(udata->x) = (*(mdata->map_x));
+		//Start Menu Boundaries
+		if (*(udata->ub_y_off) < 247)
+			*(udata->ub_y_off) = 247;
+		else if (*(udata->ub_y_off) > 365)
+			*(udata->ub_y_off) = 365;
 
-		//if (*(udata->y) < -(*(mdata->map_y))) //top border
-		//	*(udata->y) = (*(mdata->map_y));
-		//else if (*(udata->y) >= (*(mdata->map_y))) //bottom border
-		//	*(udata->y) = (*(mdata->map_y));
+
+		//if (*(udata->x) < -(*(udata->map_x))) //left border
+		//	*(udata->x) = -(*(udata->map_x));
+		//else if (*(udata->x) >= (*(udata->map_x))) //right border
+		//	*(udata->x) = (*(udata->map_x));
+
+		//if (*(udata->y) < -(*(udata->map_y))) //top border
+		//	*(udata->y) = (*(udata->map_y));
+		//else if (*(udata->y) >= (*(udata->map_y))) //bottom border
+		//	*(udata->y) = (*(udata->map_y));
 	}
 }
