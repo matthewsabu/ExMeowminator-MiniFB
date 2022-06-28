@@ -36,10 +36,21 @@ typedef struct
 	//int *rx_dir;
 	//int *ry_dir;
 	//int *rx;
-	//int *ry;
+	int *ry1;
+	int *ry2;
+	int *ry3;
+	int *ry4;
+	int *ry5;
 	//int *rx_old;
 	//int *ry_old;
 	//int *rs;
+	//int rat_hp[11];
+	int *hp_pos;
+	int *r1_hp;
+	int *r2_hp;
+	int *r3_hp;
+	int *r4_hp;
+	int *r5_hp;
 } user_data;
 
 int randomizer = 1; // RANDOMIZE ONCE ONLY
@@ -47,6 +58,8 @@ int rand_xnum = 0; //-200
 int rand_ynum = 0; //30
 int rand_x[10] = {};
 int rand_y[10] = {};
+
+int dead = 0;
 
 int main()
 {
@@ -322,14 +335,51 @@ int main()
 		static int dir = 1;
 		static int cat_type = 1;
 
-		static int rx_dir = 2; //0 - left | 1 - right | 2 - no movement
-		static int ry_dir = 0; //0 - up | 1 - down | 2 - no movement
-		static int rx = 0;
-		static int ry = 0;
-		static int rx_old = rx;
-		static int ry_old = ry;
-		static int rs = 0;
+		static int rx_dir1 = 2; //0 - left | 1 - right | 2 - no movement
+		static int ry_dir1 = 0; //0 - up | 1 - down | 2 - no movement
+		static int rx1 = 0;
+		static int ry1 = 0;
+		static int rx_old1 = rx1;
+		static int ry_old1 = ry1;
+		static int rs1 = 0;
+
+		static int rx_dir2 = 2; //0 - left | 1 - right | 2 - no movement
+		static int ry_dir2 = 0; //0 - up | 1 - down | 2 - no movement
+		static int rx2 = 0;
+		static int ry2 = 0;
+		static int rx_old2 = rx2;
+		static int ry_old2 = ry2;
+		static int rs2 = 0;
+
+		static int rx_dir3 = 2; //0 - left | 1 - right | 2 - no movement
+		static int ry_dir3 = 0; //0 - up | 1 - down | 2 - no movement
+		static int rx3 = 0;
+		static int ry3 = 0;
+		static int rx_old3 = rx3;
+		static int ry_old3 = ry3;
+		static int rs3 = 0;
+
+		static int rx_dir4 = 2; //0 - left | 1 - right | 2 - no movement
+		static int ry_dir4 = 0; //0 - up | 1 - down | 2 - no movement
+		static int rx4 = 0;
+		static int ry4 = 0;
+		static int rx_old4 = rx4;
+		static int ry_old4 = ry4;
+		static int rs4 = 0;
+
+		static int rx_dir5 = 2; //0 - left | 1 - right | 2 - no movement
+		static int ry_dir5 = 0; //0 - up | 1 - down | 2 - no movement
+		static int rx5 = 0;
+		static int ry5 = 0;
+		static int rx_old5 = rx5;
+		static int ry_old5 = ry5;
+		static int rs5 = 0;
+		
 		static int wave = 1; // change to test wave 1, wave 2, wave 3
+		static int rat_hp[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		static int hp_pos = 10;
+		//static int hp_val;
+		static int r1_hp = 0, r2_hp = 0, r3_hp = 0, r4_hp = 0, r5_hp = 0, r6_hp = 0, r7_hp = 0, r8_hp = 0, r9_hp = 0, r10_hp = 0;
 
 		uint8_t* ui_btns[2] = { ui_btn1, ui_btn2 };
 
@@ -339,7 +389,7 @@ int main()
 		uint8_t* easy[4] = { sprite32, sprite33, sprite34, sprite35 };
 		uint8_t* medium[4] = { sprite36, sprite37, sprite38, sprite39 };
 		uint8_t* hard[4] = { sprite40, sprite41, sprite42, sprite43 };
-
+		
 		udata.x = &bg_x;
 		udata.x_old = &bg_x_old;
 		udata.y = &bg_y;
@@ -358,14 +408,26 @@ int main()
 		//udata.rx_dir = &rx_dir;
 		//udata.ry_dir = &ry_dir;
 		//udata.rx = &rx;
-		//udata.ry = &ry;
+		udata.ry1 = &ry1;
+		udata.ry2 = &ry2;
+		udata.ry3 = &ry3;
+		udata.ry4 = &ry4;
+		udata.ry5 = &ry5;
 		//udata.rx_old = &rx_old;
 		//udata.ry_old = &ry_old;
 		//udata.rs = &rs;
+		////udata.rat_hp[10] = rat_hp[10];
+		udata.hp_pos = &hp_pos;
+		//udata.hp_val = &hp_val;
+		udata.r1_hp = &r1_hp;
+		udata.r2_hp = &r2_hp;
+		udata.r3_hp = &r3_hp;
+		udata.r4_hp = &r4_hp;
+		udata.r5_hp = &r5_hp;
 				
 		if (game_mode == 0) {
 			// Redraw the background 
-					// 10k pixels
+			// 10k pixels
 			for (int i = 0; i < 106; i++)
 			{
 				for (int j = 0; j < 456; j++)
@@ -379,7 +441,6 @@ int main()
 				}
 			}
 
-			// Change sprite used depending on direction
 			// Draws the sprite over the background in the framebuffer
 			// 10k pixels
 			for (int i = 0; i < 106; i++)
@@ -399,23 +460,23 @@ int main()
 		else { 
 			// Redraw the background 
 			// 10k pixels
-			for (int i = 0; i < 30; i++)
+			for (int i = 0; i < 32; i++)
 			{
 				for (int j = 0; j < 42; j++)
 				{
-					uint8_t r = maps[m][map_x * 3 * (i + bg_y_old + 277) + 3 * (bg_x_old + j + 377) + 2];
-					uint8_t g = maps[m][map_x * 3 * (i + bg_y_old + 277) + 3 * (bg_x_old + j + 377) + 1];
-					uint8_t b = maps[m][map_x * 3 * (i + bg_y_old + 277) + 3 * (bg_x_old + j + 377)];
+					uint8_t r = maps[m][map_x * 3 * (i + bg_y_old + 284) + 3 * (bg_x_old + j + 379) + 2];
+					uint8_t g = maps[m][map_x * 3 * (i + bg_y_old + 284) + 3 * (bg_x_old + j + 379) + 1];
+					uint8_t b = maps[m][map_x * 3 * (i + bg_y_old + 284) + 3 * (bg_x_old + j + 379)];
 					uint32_t pixel = (r << 16) | (g << 8) | b;
 					if (pixel)
-						buffer[map_x * (i + bg_y_old + 277) + (j + bg_x_old + 377)] = pixel; //-- CENTER
+						buffer[map_x * (i + bg_y_old + 284) + (j + bg_x_old + 379)] = pixel; //-- CENTER
 				}
 			}
 
 			// Change sprite used depending on direction
 			// Draws the sprite over the background in the framebuffer
 			// 10k pixels
-			for (int i = 0; i < 30; i++)
+			for (int i = 0; i < 32; i++)
 			{
 				for (int j = 0; j < 42; j++)
 				{
@@ -424,7 +485,7 @@ int main()
 					uint8_t b = sprites[s][42 * 4 * i + 4 * j];
 					uint32_t pixel = (r << 16) | (g << 8) | b;
 					if (pixel)
-						buffer[map_x * (i + bg_y + 277) + (j + bg_x + 377)] = pixel; //-- CENTER
+						buffer[map_x * (i + bg_y + 284) + (j + bg_x + 379)] = pixel; //-- CENTER
 				}
 			}
 
@@ -492,8 +553,35 @@ int main()
 					}
 				}
 			}
+
+			//update current hp of each rat
+			//rat_hp[hp_pos] = hp_val;
+			rat_hp[0] = r1_hp;
+			rat_hp[1] = r2_hp;
+			rat_hp[2] = r3_hp;
+			rat_hp[3] = r4_hp;
+			rat_hp[4] = r5_hp;
+			rat_hp[5] = r6_hp;
+			rat_hp[6] = r7_hp;
+			rat_hp[7] = r8_hp;
+			rat_hp[8] = r9_hp;
+			rat_hp[9] = r10_hp;
 			
 			if (randomizer) {
+				if (wave == 1) {
+					r1_hp = 1;
+					r2_hp = 1;
+					r3_hp = 1;
+					r4_hp = 1;
+					r5_hp = 2;
+					for (int i = 0; i < 4; i++) 
+						rat_hp[i] = 1;					
+					for (int i = 4; i < 5; i++) 
+						rat_hp[i] = 2;					
+					for (int i = 5; i < 10; i++) 
+						rat_hp[i] = 0;					
+				}
+									
 				for (int i = 0; i < 10; i++)
 				{
 					rand_xnum = generate_RandomX();
@@ -522,6 +610,14 @@ int main()
 				randomizer = 0; // set randomizer 1 again after wave is done
 			}
 
+			if (rat_hp[0] <= 0 && rat_hp[1] <= 0 && rat_hp[2] <= 0 && rat_hp[3] <= 0 && rat_hp[4] <= 0 &&
+				rat_hp[5] <= 0 && rat_hp[6] <= 0 && rat_hp[7] <= 0 && rat_hp[8] <= 0 && rat_hp[9] <= 0)
+				dead = 1;
+
+			for (int i = 0; i < 10; i++) {
+				printf("rat_hp[%d] = %d\n", i, rat_hp[i]);
+			}
+
 			//for (int i = 0; i < 10; i++) {
 			//	printf("X [%d] = %d\n", i, rand_x[i]);
 			//}
@@ -530,70 +626,195 @@ int main()
 			//}
 			printf("X [%d] = %d\n", 0, rand_x[0]);
 			printf("Y [%d] = %d\n", 0, rand_y[0]);
+			printf("X [%d] = %d\n", 4, rand_x[4]);
+			printf("Y [%d] = %d\n", 4, rand_y[4]);
 
 			if (wave == 1) { // first wave, 5 rats
-				//for (int x = 0; x < 4; x++) { // 4 easy
-				//	for (int i = 0; i < 22; i++)
-				//	{
-				//		for (int j = 0; j < 28; j++)
-				//		{
-				//			uint8_t r = easy[x][28 * 4 * i + 4 * j + 2];
-				//			uint8_t g = easy[x][28 * 4 * i + 4 * j + 1];
-				//			uint8_t b = easy[x][28 * 4 * i + 4 * j];
-				//			uint32_t pixel = (r << 16) | (g << 8) | b;
-				//			if (pixel)
-				//				buffer[map_x * (i + rand_y[x]) + (j + rand_x[x])] = pixel;
-				//		}
-				//	}
-				//}
-
-				//testing with 1 rat muna
-				for (int i = 0; i < 22; i++)
-				{
-					for (int j = 0; j < 28; j++)
-					{
-						uint8_t r = easy[rs][28 * 4 * i + 4 * j + 2];
-						uint8_t g = easy[rs][28 * 4 * i + 4 * j + 1];
-						uint8_t b = easy[rs][28 * 4 * i + 4 * j];
-						uint32_t pixel = (r << 16) | (g << 8) | b;
-						if (pixel)
-							buffer[map_x * (i + ry + rand_y[0]) + (j + rx + rand_x[0])] = pixel;
+				if (dead == 0) {
+					if (rat_hp[0] > 0) {
+						for (int i = 0; i < 22; i++)
+						{
+							for (int j = 0; j < 28; j++)
+							{
+								uint8_t r = easy[rs1][28 * 4 * i + 4 * j + 2];
+								uint8_t g = easy[rs1][28 * 4 * i + 4 * j + 1];
+								uint8_t b = easy[rs1][28 * 4 * i + 4 * j];
+								uint32_t pixel = (r << 16) | (g << 8) | b;
+								if (pixel)
+									buffer[map_x * (i + ry1 + rand_y[0]) + (j + rx1 + rand_x[0])] = pixel;
+							}
+						}
+						rx_old1 = rx1;
+						if (rx1 <= map_x - 309) {  //800
+							if (rx_dir1 == 1)
+								rx1 += 1;
+							else if (rx_dir1 == 2)
+								rx1 += 0;
+							else
+								rx1 -= 1;
+						}
+						ry_old1 = ry1;
+						if (ry1 <= map_y - 326) {  //600
+							if (ry_dir1 == 1)
+								ry1 += 1;
+							else if (ry_dir1 == 2)
+								ry1 += 0;
+							else
+								ry1 -= 1;
+						}
 					}
-				}
 
-				rx_old = rx;
-				if (rx <= map_x - 309) {  //800
-					if (rx_dir == 1)
-						rx += 1;
-					else if (rx_dir == 2)
-						rx += 0;
-					else
-						rx -= 1;
-				}
+					if (rat_hp[1] > 0) {
+						for (int i = 0; i < 22; i++)
+						{
+							for (int j = 0; j < 28; j++)
+							{
+								uint8_t r = easy[rs2][28 * 4 * i + 4 * j + 2];
+								uint8_t g = easy[rs2][28 * 4 * i + 4 * j + 1];
+								uint8_t b = easy[rs2][28 * 4 * i + 4 * j];
+								uint32_t pixel = (r << 16) | (g << 8) | b;
+								if (pixel)
+									buffer[map_x * (i + ry2 + rand_y[1]) + (j + rx2 + rand_x[1])] = pixel;
+							}
+						}
+						rx_old2 = rx2;
+						if (rx2 <= map_x - 309) {  //800
+							if (rx_dir2 == 1)
+								rx2 += 1;
+							else if (rx_dir2 == 2)
+								rx2 += 0;
+							else
+								rx2 -= 1;
+						}
+						ry_old2 = ry2;
+						if (ry2 <= map_y - 326) {  //600
+							if (ry_dir2 == 1)
+								ry2 += 1;
+							else if (ry_dir2 == 2)
+								ry2 += 0;
+							else
+								ry2 -= 1;
+						}
+					}
 
-				ry_old = ry;
-				if (ry <= map_y - 326) {  //600
-					if (ry_dir == 1)
-						ry += 1;
-					else if (ry_dir == 2)
-						ry += 0;
-					else
-						ry -= 1;
-				}
+					if (rat_hp[2] > 0) {
+						for (int i = 0; i < 22; i++)
+						{
+							for (int j = 0; j < 28; j++)
+							{
+								uint8_t r = easy[rs3][28 * 4 * i + 4 * j + 2];
+								uint8_t g = easy[rs3][28 * 4 * i + 4 * j + 1];
+								uint8_t b = easy[rs3][28 * 4 * i + 4 * j];
+								uint32_t pixel = (r << 16) | (g << 8) | b;
+								if (pixel)
+									buffer[map_x * (i + ry3 + rand_y[2]) + (j + rx3 + rand_x[2])] = pixel;
+							}
+						}
+						rx_old3 = rx3;
+						if (rx3 <= map_x - 309) {  //800
+							if (rx_dir3 == 1)
+								rx3 += 1;
+							else if (rx_dir3 == 2)
+								rx3 += 0;
+							else
+								rx3 -= 1;
+						}
+						ry_old3 = ry3;
+						if (ry3 <= map_y - 326) {  //600
+							if (ry_dir3 == 1)
+								ry3 += 1;
+							else if (ry_dir3 == 2)
+								ry3 += 0;
+							else
+								ry3 -= 1;
+						}
+					}
+
+					if (rat_hp[3] > 0) {
+						for (int i = 0; i < 22; i++)
+						{
+							for (int j = 0; j < 28; j++)
+							{
+								uint8_t r = easy[rs4][28 * 4 * i + 4 * j + 2];
+								uint8_t g = easy[rs4][28 * 4 * i + 4 * j + 1];
+								uint8_t b = easy[rs4][28 * 4 * i + 4 * j];
+								uint32_t pixel = (r << 16) | (g << 8) | b;
+								if (pixel)
+									buffer[map_x * (i + ry4 + rand_y[3]) + (j + rx4 + rand_x[3])] = pixel;
+							}
+						}
+						rx_old4 = rx4;
+						if (rx4 <= map_x - 309) {  //800
+							if (rx_dir4 == 1)
+								rx4 += 1;
+							else if (rx_dir4 == 2)
+								rx4 += 0;
+							else
+								rx4 -= 1;
+						}
+						ry_old4 = ry4;
+						if (ry4 <= map_y - 326) {  //600
+							if (ry_dir4 == 1)
+								ry4 += 1;
+							else if (ry_dir4 == 2)
+								ry4 += 0;
+							else
+								ry4 -= 1;
+						}
+					}
 
 				// 1 medium
-				for (int i = 0; i < 22; i++)
-				{
-					for (int j = 0; j < 28; j++)
-					{
-						uint8_t r = medium[0][28 * 4 * i + 4 * j + 2];
-						uint8_t g = medium[0][28 * 4 * i + 4 * j + 1];
-						uint8_t b = medium[0][28 * 4 * i + 4 * j];
-						uint32_t pixel = (r << 16) | (g << 8) | b;
-						if (pixel)
-							buffer[map_x * (i + rand_y[4]) + (j + rand_x[4])] = pixel;
+					if (rat_hp[4] > 0) {
+						for (int i = 0; i < 22; i++)
+						{
+							for (int j = 0; j < 28; j++)
+							{
+								uint8_t r = medium[rs5][28 * 4 * i + 4 * j + 2];
+								uint8_t g = medium[rs5][28 * 4 * i + 4 * j + 1];
+								uint8_t b = medium[rs5][28 * 4 * i + 4 * j];
+								uint32_t pixel = (r << 16) | (g << 8) | b;
+								if (pixel)
+									buffer[map_x * (i + ry5 + rand_y[4]) + (j + rx5 + rand_x[4])] = pixel;
+							}
+						}
+						rx_old5 = rx5;
+						if (rx5 <= map_x - 309) {  //800
+							if (rx_dir5 == 1)
+								rx5 += 1;
+							else if (rx_dir5 == 2)
+								rx5 += 0;
+							else
+								rx5 -= 1;
+						}
+						ry_old5 = ry5;
+						if (ry5 <= map_y - 326) {  //600
+							if (ry_dir5 == 1)
+								ry5 += 1;
+							else if (ry_dir5 == 2)
+								ry5 += 0;
+							else
+								ry5 -= 1;
+						}
 					}
 				}
+
+				else {
+					// Draws the sprite over the background in the framebuffer
+					// 10k pixels
+					for (int i = 0; i < 32; i++)
+					{
+						for (int j = 0; j < 42; j++)
+						{
+							uint8_t r = sprites[19][42 * 4 * i + 4 * j + 2];
+							uint8_t g = sprites[19][42 * 4 * i + 4 * j + 1];
+							uint8_t b = sprites[19][42 * 4 * i + 4 * j];
+							uint32_t pixel = (r << 16) | (g << 8) | b;
+							if (pixel)
+								buffer[map_x * (i + 284) + (j + 379)] = pixel; //-- CENTER
+						}
+					}
+				}
+				
 			}
 
 			if (wave == 2) { // second wave, 7 rats
@@ -687,21 +908,56 @@ int main()
 
 			//Rat Borders			
 			//Top and Bottom
-			if (ry == (-rand_y[0] + (map_y - 967))) { // -rand_y + (1293 - upper)
-				ry_dir = 1;
-				rs = 1;
+			if (ry1 == (-rand_y[0] + (map_y - 967))) { // -rand_y + (1293 - upper)
+				ry_dir1 = 1;
+				rs1 = 1;
+			}
+			if (ry1 == (967 - rand_y[0] + 22)) {	//upper - rand_y + rat height
+				ry_dir1 = 0;
+				rs1 = 0;
 			}
 
-			if (ry == (967 - rand_y[0] + 22)) {	//upper - rand_y + rat height
-				ry_dir = 0;
-				rs = 0;
+			if (ry2 == (-rand_y[1] + (map_y - 967))) { // -rand_y + (1293 - upper)
+				ry_dir2 = 1;
+				rs2 = 1;
+			}
+			if (ry2 == (967 - rand_y[1] + 22)) {	//upper - rand_y + rat height
+				ry_dir2 = 0;
+				rs2 = 0;
+			}
+
+			if (ry3 == (-rand_y[2] + (map_y - 967))) { // -rand_y + (1293 - upper)
+				ry_dir3 = 1;
+				rs3 = 1;
+			}
+			if (ry3 == (967 - rand_y[2] + 22)) {	//upper - rand_y + rat height
+				ry_dir3 = 0;
+				rs3 = 0;
+			}
+
+			if (ry4 == (-rand_y[3] + (map_y - 967))) { // -rand_y + (1293 - upper)
+				ry_dir4 = 1;
+				rs4 = 1;
+			}
+			if (ry4 == (967 - rand_y[3] + 22)) {	//upper - rand_y + rat height
+				ry_dir4 = 0;
+				rs4 = 0;
+			}
+
+			if (ry5 == (-rand_y[4] + (map_y - 967))) { // -rand_y + (1293 - upper)
+				ry_dir5 = 1;
+				rs5 = 1;
+			}
+			if (ry5 == (967 - rand_y[4] + 22)) {	//upper - rand_y + rat height
+				ry_dir5 = 0;
+				rs5 = 0;
 			}
 
 			//Left and Right
 
 
-			printf("rx = %d\n", rx);
-			printf("ry = %d\n\n", ry);
+			printf("rx = %d\n", rx1);
+			printf("ry = %d\n\n", ry1);
 
 		}
 
@@ -769,17 +1025,28 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
 		}
 		
-		if (key == KB_KEY_M) {
-			*(udata->map_x) = 988;
-			*(udata->map_y) = 1062;
-			//*(udata->map_change) = 1;
-			*(udata->m) = 2;
-			*(udata->map_ctr) += 1;
-			printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
-		}		
+		//if (key == KB_KEY_M) {
+		//	*(udata->map_x) = 988;
+		//	*(udata->map_y) = 1062;
+		//	//*(udata->map_change) = 1;
+		//	*(udata->m) = 2;
+		//	*(udata->map_ctr) += 1;
+		//	printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
+		//}		
 
 		//Menu Keys
 		if (key == KB_KEY_ENTER) {
+			if (*(udata->game_mode) == 1) {
+				if (*(udata->x) == 0 && *(udata->y) == 0) {
+					*(udata->map_x) = 988;
+					*(udata->map_y) = 1062;
+					//*(udata->map_change) = 1;
+					*(udata->m) = 2;
+					*(udata->map_ctr) += 1;
+					printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
+					//*(udata->game_mode) = 2;
+				}
+			}
 			if (*(udata->game_mode) == 0) {
 				*(udata->map_x) = 1436;
 				*(udata->map_y) = 1293;
@@ -788,7 +1055,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->map_ctr) += 1;
 				printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
 				*(udata->game_mode) = 1;
-			}
+			}			
 		}
 
 		//MOVEMENT
@@ -852,6 +1119,49 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			*(udata->s) = 3 + type_i;
 			*(udata->a) = 1;
 			printf("Light Attack Right\n");
+
+			////non-moving rats
+			//if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  //rand x - cat x offset - cat width
+			//	if (*(udata->y) >= (rand_y[4]) - 284 - 32 && *(udata->y) <= (rand_y[4]) - 284) { //rand y - cat y offset - height && rand y - cat y offset
+			//		*(udata->hp_pos) = 4;
+			//		*(udata->r5_hp) -= 1;
+			//		//printf("hop_pos = %d\n", *(udata->hp_pos));
+			//		//printf("hp_val = %d\n", *(udata->hp_val));
+			//	}
+			//}
+			//moving rats (up & down)
+			if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  //rand x - cat x offset - cat width
+				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { //rand y - cat y offset - cat height + ry && rand y - cat y offset + ry
+					*(udata->hp_pos) = 0;
+					*(udata->r1_hp) -= 1;
+				}
+			}
+			if (*(udata->x) >= (rand_x[1] - 379 - 42)) {  //rand x - cat x offset - cat width
+				if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) { 
+					*(udata->hp_pos) = 1;
+					*(udata->r2_hp) -= 1;
+				}
+			}
+			if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  //rand x - cat x offset - cat width
+				if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
+					*(udata->hp_pos) = 2;
+					*(udata->r3_hp) -= 1;
+				}
+			}
+			if (*(udata->x) >= (rand_x[3] - 379 - 42)) {  //rand x - cat x offset - cat width
+				if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
+					*(udata->hp_pos) = 3;
+					*(udata->r4_hp) -= 1;
+				}
+			}
+			if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  //rand x - cat x offset - cat width
+				if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
+					*(udata->hp_pos) = 4;
+					*(udata->r5_hp) -= 1;
+				}
+			}
+			
+
 		}
 		else if ((*udata->dir == 2) && (key == KB_KEY_A))
 		{
@@ -999,15 +1309,21 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		else if (*(udata->ub_y_off) > 365)
 			*(udata->ub_y_off) = 365;
 
+		//F2_Bedroom Walls
+		//Top
+		if (*(udata->y) < 0)
+			*(udata->y) = 0;
+		if (*(udata->x) < 0 && *(udata->y) == 0)
+			*(udata->x) = 0;
+		//Bottom
+		if (*(udata->y) > 690)
+			*(udata->y) = 690;
+		//Left
+		if (*(udata->x) < -200)
+			*(udata->x) = -200;
+		//Right
+		if (*(udata->x) > 750)
+			*(udata->x) = 750;
 
-		//if (*(udata->x) < -(*(udata->map_x))) //left border
-		//	*(udata->x) = -(*(udata->map_x));
-		//else if (*(udata->x) >= (*(udata->map_x))) //right border
-		//	*(udata->x) = (*(udata->map_x));
-
-		//if (*(udata->y) < -(*(udata->map_y))) //top border
-		//	*(udata->y) = (*(udata->map_y));
-		//else if (*(udata->y) >= (*(udata->map_y))) //bottom border
-		//	*(udata->y) = (*(udata->map_y));
 	}
 }
