@@ -11,26 +11,35 @@ int generate_RandomY();
 
 typedef struct
 {
+	//sprites
 	int *x;
 	int *x_old;
 	int *y;
 	int *y_old;
 	int *s;
-
+	//menus
 	int *game_mode; 
 	int *ub;
 	int *ub_x_off;
 	int *ub_y_off;
-
+	//bg or maps
 	int *map_x; 
 	int *map_y; 
 	//int *map_change;
 	int *m;
 	int *map_ctr;
-
+	//cats
 	int* a;
 	int* dir;
 	int* cat_type;
+	////rats
+	//int *rx_dir;
+	//int *ry_dir;
+	//int *rx;
+	//int *ry;
+	//int *rx_old;
+	//int *ry_old;
+	//int *rs;
 } user_data;
 
 int randomizer = 1; // RANDOMIZE ONCE ONLY
@@ -303,38 +312,57 @@ int main()
 		static int bg_x_old = bg_x;
 		static int bg_y_old = bg_y;
 		static int s = 1;
-		static int a = 0;
-		static int dir = 1;
-		static int cat_type = 1;
+
 		static int game_mode = 0;
 		static int ub = 0;
 		static int ub_x_off = 0;
 		static int ub_y_off = 247;
-		static int wave = 3; // change to test wave 1, wave 2, wave 3
+
+		static int a = 0;
+		static int dir = 1;
+		static int cat_type = 1;
+
+		static int rx_dir = 2; //0 - left | 1 - right | 2 - no movement
+		static int ry_dir = 0; //0 - up | 1 - down | 2 - no movement
+		static int rx = 0;
+		static int ry = 0;
+		static int rx_old = rx;
+		static int ry_old = ry;
+		static int rs = 0;
+		static int wave = 1; // change to test wave 1, wave 2, wave 3
+
+		uint8_t* ui_btns[2] = { ui_btn1, ui_btn2 };
+
 		uint8_t* sprites[20] = { sprite2, sprite3, sprite4, sprite5, sprite6, sprite7, sprite8, sprite9, sprite10, sprite11, sprite12, sprite13, sprite14, sprite15, sprite16, sprite17, sprite18, sprite19, sprite20, sprite21 };
 		uint8_t* attacks[12] = { NoAttack , light_attack, bite, furball_spit, mega_meow, tail_slap, telekinesis, flamethrower_attack, taser_attack, sword_attack };
+
 		uint8_t* easy[4] = { sprite32, sprite33, sprite34, sprite35 };
 		uint8_t* medium[4] = { sprite36, sprite37, sprite38, sprite39 };
 		uint8_t* hard[4] = { sprite40, sprite41, sprite42, sprite43 };
-		uint8_t* ui_btns[2] = { ui_btn1, ui_btn2 };
 
 		udata.x = &bg_x;
 		udata.x_old = &bg_x_old;
-
 		udata.y = &bg_y;
 		udata.y_old = &bg_y_old;
-
 		udata.s = &s;
 
-		udata.a = &a;
-		udata.dir = &dir;
-		udata.cat_type = &cat_type;
-		
 		udata.game_mode = &game_mode;
 		udata.ub = &ub;
 		udata.ub_x_off = &ub_x_off;
 		udata.ub_y_off = &ub_y_off;
 
+		udata.a = &a;
+		udata.dir = &dir;
+		udata.cat_type = &cat_type;
+
+		//udata.rx_dir = &rx_dir;
+		//udata.ry_dir = &ry_dir;
+		//udata.rx = &rx;
+		//udata.ry = &ry;
+		//udata.rx_old = &rx_old;
+		//udata.ry_old = &ry_old;
+		//udata.rs = &rs;
+				
 		if (game_mode == 0) {
 			// Redraw the background 
 					// 10k pixels
@@ -500,22 +528,59 @@ int main()
 			//for (int j = 0; j < 10; j++) {
 			//	printf("Y [%d] = %d\n", j, rand_y[j]);
 			//}
+			printf("X [%d] = %d\n", 0, rand_x[0]);
+			printf("Y [%d] = %d\n", 0, rand_y[0]);
 
 			if (wave == 1) { // first wave, 5 rats
-				for (int x = 0; x < 4; x++) { // 4 easy
-					for (int i = 0; i < 22; i++)
+				//for (int x = 0; x < 4; x++) { // 4 easy
+				//	for (int i = 0; i < 22; i++)
+				//	{
+				//		for (int j = 0; j < 28; j++)
+				//		{
+				//			uint8_t r = easy[x][28 * 4 * i + 4 * j + 2];
+				//			uint8_t g = easy[x][28 * 4 * i + 4 * j + 1];
+				//			uint8_t b = easy[x][28 * 4 * i + 4 * j];
+				//			uint32_t pixel = (r << 16) | (g << 8) | b;
+				//			if (pixel)
+				//				buffer[map_x * (i + rand_y[x]) + (j + rand_x[x])] = pixel;
+				//		}
+				//	}
+				//}
+
+				//testing with 1 rat muna
+				for (int i = 0; i < 22; i++)
+				{
+					for (int j = 0; j < 28; j++)
 					{
-						for (int j = 0; j < 28; j++)
-						{
-							uint8_t r = easy[x][28 * 4 * i + 4 * j + 2];
-							uint8_t g = easy[x][28 * 4 * i + 4 * j + 1];
-							uint8_t b = easy[x][28 * 4 * i + 4 * j];
-							uint32_t pixel = (r << 16) | (g << 8) | b;
-							if (pixel)
-								buffer[map_x * (i + rand_y[x]) + (j + rand_x[x])] = pixel;
-						}
+						uint8_t r = easy[rs][28 * 4 * i + 4 * j + 2];
+						uint8_t g = easy[rs][28 * 4 * i + 4 * j + 1];
+						uint8_t b = easy[rs][28 * 4 * i + 4 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[map_x * (i + ry + rand_y[0]) + (j + rx + rand_x[0])] = pixel;
 					}
 				}
+
+				rx_old = rx;
+				if (rx <= map_x - 309) {  //800
+					if (rx_dir == 1)
+						rx += 1;
+					else if (rx_dir == 2)
+						rx += 0;
+					else
+						rx -= 1;
+				}
+
+				ry_old = ry;
+				if (ry <= map_y - 326) {  //600
+					if (ry_dir == 1)
+						ry += 1;
+					else if (ry_dir == 2)
+						ry += 0;
+					else
+						ry -= 1;
+				}
+
 				// 1 medium
 				for (int i = 0; i < 22; i++)
 				{
@@ -619,10 +684,28 @@ int main()
 					}
 				}
 			}
+
+			//Rat Borders			
+			//Top and Bottom
+			if (ry == (-rand_y[0] + (map_y - 967))) { // -rand_y + (1293 - upper)
+				ry_dir = 1;
+				rs = 1;
+			}
+
+			if (ry == (967 - rand_y[0] + 22)) {	//upper - rand_y + rat height
+				ry_dir = 0;
+				rs = 0;
+			}
+
+			//Left and Right
+
+
+			printf("rx = %d\n", rx);
+			printf("ry = %d\n\n", ry);
+
 		}
 
 		
-
 		////will overload ur memory thats 
 		////why key press to change maps nlg
 		//if (bg_x > 100 && bg_y > 100) {
