@@ -54,16 +54,19 @@ typedef struct
 	int* r4_hp;
 	int* r5_hp;
 	//kill count
+	int* weapontaken;
 	int* kill_count;
 } user_data;
 
 int randomizer = 1; // RANDOMIZE ONCE ONLY
 int rand_xnum = 0; //-200
 int rand_ynum = 0; //30
-int rand_x[10] = {};
-int rand_y[10] = {};
+int rand_x[12] = {};
+int rand_y[12] = {};
 
 int dead = 0;
+int rand_weapon = rand() % (2 + 1 - 0) + 0; //need to improve on this since its too small ung range. also needs to randomize per wave
+
 
 int main()
 {
@@ -285,6 +288,18 @@ int main()
 	FreeImage_FlipVertical(fi_sprite44);
 	uint8_t* sprite44 = FreeImage_GetBits(fi_sprite44);
 
+	FIBITMAP* fi_sprite45 = FreeImage_Load(FIF_PNG, "assets_meow/Sword.png");
+	FreeImage_FlipVertical(fi_sprite45);
+	uint8_t* sword = FreeImage_GetBits(fi_sprite45);
+
+	FIBITMAP* fi_sprite46 = FreeImage_Load(FIF_PNG, "assets_meow/Flamethrower.png");
+	FreeImage_FlipVertical(fi_sprite46);
+	uint8_t* flamethrower = FreeImage_GetBits(fi_sprite46);
+
+	FIBITMAP* fi_sprite47 = FreeImage_Load(FIF_PNG, "assets_meow/Taser.png");
+	FreeImage_FlipVertical(fi_sprite47);
+	uint8_t* taser = FreeImage_GetBits(fi_sprite47);
+
 	//// Copies the full background to the framebuffer
 	//for (int i = 0; i < map_x *  map_y * 3; i += 3)
 	//	buffer[i / 3] = (bg2[i + 2] << 16) | (bg2[i + 1] << 8) | bg2[i];
@@ -406,6 +421,7 @@ int main()
 		static int hp_pos = 10;
 
 		static int kill_count = 0;
+		static int weapontaken = 0;
 		static int currency = 0;
 
 		//static int hp_val;
@@ -414,7 +430,8 @@ int main()
 		uint8_t* ui_btns[5] = { ui_btn1, ui_btn2, ui_btn3, ui_btn4, ui_btn5 };
 
 		uint8_t* sprites[21] = { sprite2, sprite3, sprite4, sprite5, sprite6, sprite7, sprite8, sprite9, sprite10, sprite11, sprite12, sprite13, sprite14, sprite15, sprite16, sprite17, sprite18, sprite19, sprite20, sprite21, sprite44 };
-		uint8_t* attacks[12] = { NoAttack , light_attack, bite, furball_spit, mega_meow, tail_slap, telekinesis, flamethrower_attack, taser_attack, sword_attack };
+		uint8_t* attacks[12] = { NoAttack , light_attack, bite, furball_spit, mega_meow, tail_slap, telekinesis, flamethrower_attack, sword_attack  , taser_attack };
+		uint8_t* weapons[5] = { sword, flamethrower, taser };
 
 		uint8_t* easy[4] = { sprite32, sprite33, sprite34, sprite35 };
 		uint8_t* medium[4] = { sprite36, sprite37, sprite38, sprite39 };
@@ -458,6 +475,7 @@ int main()
 		udata.r5_hp = &r5_hp;
 
 		udata.kill_count = &kill_count;
+		udata.weapontaken = &weapontaken;
 
 		if (game_mode == 0) { //start menu
 			//if (direct == 0 || direct == 2) {
@@ -676,10 +694,10 @@ int main()
 						rat_hp[i] = 0;
 				}
 
-				for (int i = 0; i < 10; i++)
+				for (int i = 0; i < 12; i++)
 				{
 					rand_xnum = generate_RandomX(room_no);
-					for (int j = 0; j < 10; j++)
+					for (int j = 0; j < 12; j++)
 					{
 						if ((rand_x[j] >= rand_xnum) && (rand_xnum <= rand_x[j] + 30)) {
 							rand_xnum = generate_RandomX(room_no);
@@ -689,10 +707,10 @@ int main()
 						}
 					}
 				}
-				for (int i = 0; i < 10; i++)
+				for (int i = 0; i < 12; i++)
 				{
 					rand_ynum = generate_RandomY(room_no);
-					for (int j = 0; j < 10; j++) {
+					for (int j = 0; j < 12; j++) {
 						if ((rand_y[j] >= rand_ynum) && (rand_ynum <= rand_y[j] + 30)) {
 							rand_ynum = generate_RandomY(room_no);
 						}
@@ -724,6 +742,24 @@ int main()
 			printf("Y [%d] = %d\n", 4, rand_y[4]);
 
 			if (wave == 1) { // first wave, 5 rats
+				if (weapontaken == 0) { //it just spawns
+
+					for (int i = 0; i < 20; i++)
+					{
+						for (int j = 0; j < 44; j++)
+						{
+							uint8_t r = weapons[rand_weapon][44 * 4 * i + 4 * j + 2];
+							uint8_t g = weapons[rand_weapon][44 * 4 * i + 4 * j + 1];
+							uint8_t b = weapons[rand_weapon][44 * 4 * i + 4 * j];
+							uint32_t pixel = (r << 16) | (g << 8) | b;
+							if (pixel)
+								buffer[map_x * (i + rand_y[11]) + (j + rand_x[11])] = pixel;
+						}
+					}
+
+				}
+
+				//no need to add else for weaponstaken
 				if (dead == 0) {
 					if (rat_hp[0] > 0) {
 						for (int i = 0; i < 22; i++)
@@ -1230,6 +1266,14 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->s) = 2 + type_i;
 				*(udata->a) = 0;
 				printf("Left\n");
+
+				if (*(udata->x) >= (rand_x[11] - 379 - 44)) {  //rand x - cat x offset - cat width
+					if (*(udata->y) >= (rand_y[11]) - 284 - 32 && *(udata->y) <= (rand_y[11]) - 284) {
+						*(udata->weapontaken) = 1;
+						specialattack_i = rand_weapon;
+
+					}
+				}
 			}
 		}
 		else if (key == KB_KEY_RIGHT)
@@ -1250,6 +1294,14 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->s) = 3 + type_i;
 				*(udata->a) = 0;
 				printf("Right\n");
+
+				if (*(udata->x) >= (rand_x[11] - 379 - 44)) {  //rand x - cat x offset - cat width
+					if (*(udata->y) >= (rand_y[11]) - 284 - 32 && *(udata->y) <= (rand_y[11]) - 284) {
+						*(udata->weapontaken) = 1;
+						specialattack_i = rand_weapon;
+
+					}
+				}
 			}
 		}
 		else if (key == KB_KEY_UP)
@@ -1276,6 +1328,14 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->s) = 0 + type_i;
 				*(udata->a) = 0;
 				printf("Up\n");
+
+				if (*(udata->x) >= (rand_x[11] - 379 - 44)) {  //rand x - cat x offset - cat width
+					if (*(udata->y) >= (rand_y[11]) - 284 - 32 && *(udata->y) <= (rand_y[11]) - 284) {
+						*(udata->weapontaken) = 1;
+						specialattack_i = rand_weapon;
+
+					}
+				}
 			}
 		}
 		else if (key == KB_KEY_DOWN)
@@ -1302,6 +1362,14 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->s) = 1 + type_i;
 				*(udata->a) = 0;
 				printf("Down\n");
+
+				if (*(udata->x) >= (rand_x[11] - 379 - 44)) {  //rand x - cat x offset - cat width
+					if (*(udata->y) >= (rand_y[11]) - 284 - 32 && *(udata->y) <= (rand_y[11]) - 284) {
+						*(udata->weapontaken) = 1;
+						specialattack_i = rand_weapon;
+
+					}
+				}
 			}
 		}
 
@@ -1788,7 +1856,9 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		else if ((*udata->dir == 3) && (key == KB_KEY_W))
 		{
 			*(udata->s) = 3 + type_i;
-			*(udata->a) = 0 + specialattack_i;
+			if (specialattack_i) {
+				*(udata->a) = 7 + specialattack_i;
+			}
 			printf("Special Attack Right\n");
 
 			if (*(udata->a) != 0) {
@@ -1848,7 +1918,9 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		else if ((*udata->dir == 2) && (key == KB_KEY_W))
 		{
 			*(udata->s) = 2 + type_i;
-			*(udata->a) = 0 + specialattack_i;
+			if (specialattack_i) {
+				*(udata->a) = 7 + specialattack_i;
+			}
 			printf("Special Attack Left\n");
 
 			if (*(udata->a) != 0) {
@@ -1908,7 +1980,9 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		else if ((*udata->dir == 1) && (key == KB_KEY_W))
 		{
 			*(udata->s) = 1 + type_i;
-			*(udata->a) = 0 + specialattack_i;
+			if (specialattack_i) {
+				*(udata->a) = 7 + specialattack_i;
+			}
 			printf("Special Attack Down\n");
 
 			if (*(udata->a) != 0) {
@@ -1968,7 +2042,9 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		else if ((*udata->dir == 0) && (key == KB_KEY_W))
 		{
 			*(udata->s) = 0 + type_i;
-			*(udata->a) = 0 + specialattack_i;
+			if (specialattack_i) {
+				*(udata->a) = 7 + specialattack_i;
+			}
 			printf("Special Attack Up\n");
 
 			if (*(udata->a) != 0) {
