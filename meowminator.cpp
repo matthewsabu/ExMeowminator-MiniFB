@@ -6,8 +6,8 @@
 #include "include/FreeImage.h"
 
 void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isPressed);
-int generate_RandomX();
-int generate_RandomY();
+int generate_RandomX(int room_no);
+int generate_RandomY(int room_no);
 
 typedef struct
 {
@@ -22,10 +22,12 @@ typedef struct
 	int* ub;
 	int* ub_x_off;
 	int* ub_y_off;
+	int* ub_next;
+	int* direct;
 	//bg or maps
 	int* map_x;
 	int* map_y;
-	//int *map_change;
+	int *room_no;
 	int* m;
 	int* map_ctr;
 	//cats
@@ -79,6 +81,10 @@ int main()
 	FreeImage_FlipVertical(fi_ui1);
 	uint8_t* ui1 = FreeImage_GetBits(fi_ui1);
 
+	FIBITMAP* fi_ui2 = FreeImage_Load(FIF_JPEG, "assets_meow/Upgrades_Menu.jpg");
+	FreeImage_FlipVertical(fi_ui2);
+	uint8_t* ui2 = FreeImage_GetBits(fi_ui2);
+
 	FIBITMAP* fi_ui_btn1 = FreeImage_Load(FIF_PNG, "assets_meow/Main_Start.png");
 	FreeImage_FlipVertical(fi_ui_btn1);
 	uint8_t* ui_btn1 = FreeImage_GetBits(fi_ui_btn1);
@@ -86,6 +92,18 @@ int main()
 	FIBITMAP* fi_ui_btn2 = FreeImage_Load(FIF_PNG, "assets_meow/Main_Upgrades.png");
 	FreeImage_FlipVertical(fi_ui_btn2);
 	uint8_t* ui_btn2 = FreeImage_GetBits(fi_ui_btn2);
+
+	FIBITMAP* fi_ui_btn3 = FreeImage_Load(FIF_PNG, "assets_meow/Upgrades_Back.png");
+	FreeImage_FlipVertical(fi_ui_btn3);
+	uint8_t* ui_btn3 = FreeImage_GetBits(fi_ui_btn3);
+
+	FIBITMAP* fi_ui_btn4 = FreeImage_Load(FIF_PNG, "assets_meow/Upgrades_Continue.png");
+	FreeImage_FlipVertical(fi_ui_btn4);
+	uint8_t* ui_btn4 = FreeImage_GetBits(fi_ui_btn4);
+
+	FIBITMAP* fi_ui_btn5 = FreeImage_Load(FIF_PNG, "assets_meow/Upgrades_Buy.png");
+	FreeImage_FlipVertical(fi_ui_btn5);
+	uint8_t* ui_btn5 = FreeImage_GetBits(fi_ui_btn5);
 
 	FIBITMAP* fi_bg1 = FreeImage_Load(FIF_JPEG, "assets_meow/F2_Bedroom.jpg");
 	FreeImage_FlipVertical(fi_bg1);
@@ -279,15 +297,15 @@ int main()
 	do {
 		static int map_x = 800; //1436
 		static int map_y = 600; //1293
-		//static int map_change = 0;
+		static int room_no = 1; //ROOM NUMBER
 		static int m = 0;
 		static int map_ctr = 0;
 
-		uint8_t* maps[3] = { ui1, bg1, bg2 };
+		uint8_t* maps[4] = { ui1, ui2, bg1, bg2 };
 
 		udata.map_x = &map_x;
 		udata.map_y = &map_y;
-		//udata.map_change = &map_change;
+		udata.room_no = &room_no;
 		udata.m = &m;
 		udata.map_ctr = &map_ctr;
 
@@ -332,10 +350,12 @@ int main()
 		static int bg_y_old = bg_y;
 		static int s = 1;
 
-		static int game_mode = 0;
+		static int game_mode = 0; //0 - start menu | 1 - game in map 1 | 2 - upgrade menu
 		static int ub = 0;
 		static int ub_x_off = 0;
 		static int ub_y_off = 247;
+		static int ub_next = 0;
+		static int direct = 0; //0 - screen 1 to screen 2 | 1 - screen 2 to screen 1
 
 		static int a = 0;
 		static int dir = 1;
@@ -387,11 +407,11 @@ int main()
 
 		static int kill_count = 0;
 		static int currency = 0;
-		
+
 		//static int hp_val;
 		static int r1_hp = 0, r2_hp = 0, r3_hp = 0, r4_hp = 0, r5_hp = 0, r6_hp = 0, r7_hp = 0, r8_hp = 0, r9_hp = 0, r10_hp = 0;
 
-		uint8_t* ui_btns[2] = { ui_btn1, ui_btn2 };
+		uint8_t* ui_btns[5] = { ui_btn1, ui_btn2, ui_btn3, ui_btn4, ui_btn5 };
 
 		uint8_t* sprites[21] = { sprite2, sprite3, sprite4, sprite5, sprite6, sprite7, sprite8, sprite9, sprite10, sprite11, sprite12, sprite13, sprite14, sprite15, sprite16, sprite17, sprite18, sprite19, sprite20, sprite21, sprite44 };
 		uint8_t* attacks[12] = { NoAttack , light_attack, bite, furball_spit, mega_meow, tail_slap, telekinesis, flamethrower_attack, taser_attack, sword_attack };
@@ -410,6 +430,8 @@ int main()
 		udata.ub = &ub;
 		udata.ub_x_off = &ub_x_off;
 		udata.ub_y_off = &ub_y_off;
+		udata.ub_next = &ub_next;
+		udata.direct = &direct;
 
 		udata.a = &a;
 		udata.dir = &dir;
@@ -437,39 +459,99 @@ int main()
 
 		udata.kill_count = &kill_count;
 
-		if (game_mode == 0) {
-			// Redraw the background 
-			// 10k pixels
-			for (int i = 0; i < 106; i++)
-			{
-				for (int j = 0; j < 456; j++)
+		if (game_mode == 0) { //start menu
+			//if (direct == 0 || direct == 2) {
+				//bg
+				for (int i = 0; i < 106; i++)
 				{
-					uint8_t r = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 24) + 3 * (bg_x_old + j + 172) + 2];
-					uint8_t g = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 24) + 3 * (bg_x_old + j + 172) + 1];
-					uint8_t b = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 24) + 3 * (bg_x_old + j + 172)];
-					uint32_t pixel = (r << 16) | (g << 8) | b;
-					if (pixel)
-						buffer[map_x * (i + bg_y_old + ub_y_off + 24) + (j + bg_x_old + 172)] = pixel; //-- CENTER
+					for (int j = 0; j < 456; j++)
+					{
+						uint8_t r = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 24) + 3 * (bg_x_old + ub_x_off + j + 172) + 2];
+						uint8_t g = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 24) + 3 * (bg_x_old + ub_x_off + j + 172) + 1];
+						uint8_t b = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 24) + 3 * (bg_x_old + ub_x_off + j + 172)];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[map_x * (i + bg_y_old + ub_y_off + 24) + (j + bg_x_old + ub_x_off + 172)] = pixel; //-- CENTER
+					}
 				}
-			}
+				//sprite
+				for (int i = 0; i < 106; i++)
+				{
+					for (int j = 0; j < 456; j++)
+					{
+						uint8_t r = ui_btns[ub][456 * 3 * i + 3 * j + 2];
+						uint8_t g = ui_btns[ub][456 * 3 * i + 3 * j + 1];
+						uint8_t b = ui_btns[ub][456 * 3 * i + 3 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[map_x * (i + bg_y + ub_y_off + 24) + (j + bg_x + ub_x_off + 172)] = pixel; //-- CENTER
+					}
+				}
+			//}
 
-			// Draws the sprite over the background in the framebuffer
-			// 10k pixels
-			for (int i = 0; i < 106; i++)
-			{
-				for (int j = 0; j < 456; j++)
+		}
+
+		if (game_mode == 1) { //upgrades menu
+			if (ub_next == 0) {
+				//bg
+				for (int i = 0; i < 52; i++)
 				{
-					uint8_t r = ui_btns[ub][456 * 3 * i + 3 * j + 2];
-					uint8_t g = ui_btns[ub][456 * 3 * i + 3 * j + 1];
-					uint8_t b = ui_btns[ub][456 * 3 * i + 3 * j];
-					uint32_t pixel = (r << 16) | (g << 8) | b;
-					if (pixel)
-						buffer[map_x * (i + bg_y + ub_y_off + 24) + (j + bg_x + 172)] = pixel; //-- CENTER
+					for (int j = 0; j < 260; j++)
+					{
+						uint8_t r = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 157) + 3 * (bg_x_old + ub_x_off + j + 143) + 2];
+						uint8_t g = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 157) + 3 * (bg_x_old + ub_x_off + j + 143) + 1];
+						uint8_t b = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 157) + 3 * (bg_x_old + ub_x_off + j + 143)];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[map_x * (i + bg_y_old + ub_y_off + 157) + (j + bg_x_old + ub_x_off + 143)] = pixel; //-- CENTER
+					}
+				}
+				//sprite
+				for (int i = 0; i < 52; i++)
+				{
+					for (int j = 0; j < 260; j++)
+					{
+						uint8_t r = ui_btns[ub][260 * 3 * i + 3 * j + 2];
+						uint8_t g = ui_btns[ub][260 * 3 * i + 3 * j + 1];
+						uint8_t b = ui_btns[ub][260 * 3 * i + 3 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[map_x * (i + bg_y + ub_y_off + 157) + (j + bg_x + ub_x_off + 143)] = pixel; //-- CENTER
+					}
 				}
 			}
-		}
+			else if (ub_next == 1) {
+				//bg
+				for (int i = 0; i < 32; i++)
+				{
+					for (int j = 0; j < 160; j++)
+					{
+						uint8_t r = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 100) + 3 * (bg_x_old + ub_x_off + j + 208) + 2];
+						uint8_t g = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 100) + 3 * (bg_x_old + ub_x_off + j + 208) + 1];
+						uint8_t b = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 100) + 3 * (bg_x_old + ub_x_off + j + 208)];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[map_x * (i + bg_y_old + ub_y_off + 100) + (j + bg_x_old + ub_x_off + 208)] = pixel; //-- CENTER
+					}
+				}
+				//sprite
+				for (int i = 0; i < 32; i++)
+				{
+					for (int j = 0; j < 160; j++)
+					{
+						uint8_t r = ui_btns[ub][160 * 3 * i + 3 * j + 2];
+						uint8_t g = ui_btns[ub][160 * 3 * i + 3 * j + 1];
+						uint8_t b = ui_btns[ub][160 * 3 * i + 3 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[map_x * (i + bg_y + ub_y_off + 100) + (j + bg_x + ub_x_off + 208)] = pixel; //-- CENTER
+					}
+				}
+			}
+		}		
+
 		//start playing the game
-		else {
+		if (game_mode == 2){
 			// Redraw the background 
 			// 10k pixels
 			for (int i = 0; i < 32; i++)
@@ -585,7 +667,7 @@ int main()
 					r2_hp = 1;
 					r3_hp = 1;
 					r4_hp = 1;
-					r5_hp = 1;
+					r5_hp = 2;
 					for (int i = 0; i < 4; i++)
 						rat_hp[i] = 1;
 					for (int i = 4; i < 5; i++)
@@ -596,11 +678,11 @@ int main()
 
 				for (int i = 0; i < 10; i++)
 				{
-					rand_xnum = generate_RandomX();
+					rand_xnum = generate_RandomX(room_no);
 					for (int j = 0; j < 10; j++)
 					{
 						if ((rand_x[j] >= rand_xnum) && (rand_xnum <= rand_x[j] + 30)) {
-							rand_xnum = generate_RandomX();
+							rand_xnum = generate_RandomX(room_no);
 						}
 						else {
 							rand_x[i] = rand_xnum;
@@ -609,10 +691,10 @@ int main()
 				}
 				for (int i = 0; i < 10; i++)
 				{
-					rand_ynum = generate_RandomY();
+					rand_ynum = generate_RandomY(room_no);
 					for (int j = 0; j < 10; j++) {
 						if ((rand_y[j] >= rand_ynum) && (rand_ynum <= rand_y[j] + 30)) {
-							rand_ynum = generate_RandomY();
+							rand_ynum = generate_RandomY(room_no);
 						}
 						else {
 							rand_y[i] = rand_ynum;
@@ -1006,19 +1088,31 @@ int main()
 	return 0;
 }
 
-int generate_RandomX()
+int generate_RandomX(int room_no)
 {
-	int num;
+	int num, upper, lower;
+	
+	if (room_no == 1) {
+		upper = 1127;
+		lower = 177;
+	}
+
 	//num = rand() % 1100; // should be less than map size - 30 (width of rat) 750
-	num = (rand() % (1127 - 177 + 1)) + 177; // (upper - lower + 1) + lower;
+	num = (rand() % (upper - lower + 1)) + lower; // (upper - lower + 1) + lower;
 	return num;
 }
 
-int generate_RandomY()
+int generate_RandomY(int room_no)
 {
-	int num;
+	int num, upper, lower;
+
+	if (room_no == 1) {
+		upper = 967;
+		lower = 407;
+	}
+	
 	//num = rand() % 1000; // should be less than map size - 30 (height of rat) 690
-	num = (rand() % (967 - 407 + 1)) + 407; // (upper - lower + 1) + lower;
+	num = (rand() % (upper - lower + 1)) + lower; // (upper - lower + 1) + lower;
 	return num;
 }
 
@@ -1035,7 +1129,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			*(udata->map_x) = 1436;
 			*(udata->map_y) = 1293;
 			//*(udata->map_change) = 0;
-			*(udata->m) = 1;
+			*(udata->m) = 2;
 			*(udata->map_ctr) += 1;
 			printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
 		}
@@ -1051,32 +1145,85 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 
 		//Menu Keys
 		if (key == KB_KEY_ENTER) {
-			if (*(udata->game_mode) == 1) {
+			if (*(udata->game_mode) == 2) {
 				if (*(udata->x) == 0 && *(udata->y) == 0) {
-					*(udata->map_x) = 988;
-					*(udata->map_y) = 1062;
+					*(udata->map_x) = 800;
+					*(udata->map_y) = 600;
 					//*(udata->map_change) = 1;
-					*(udata->m) = 2;
+					*(udata->m) = 1;
 					*(udata->map_ctr) += 1;
-					printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
-					//*(udata->game_mode) = 2;
+					//printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
+					*(udata->game_mode) = 1;
 				}
 			}
-			if (*(udata->game_mode) == 0) {
-				*(udata->map_x) = 1436;
-				*(udata->map_y) = 1293;
-				//*(udata->map_change) = 0;
-				*(udata->m) = 1;
-				*(udata->map_ctr) += 1;
-				printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
-				*(udata->game_mode) = 1;
+
+			if (*(udata->game_mode) == 1) {
+				//printf("BACK NOW x= %d\n", *(udata->ub_x_off));
+				//printf("BACK NOW y= %d\n", *(udata->ub_y_off));
+				if (*(udata->direct) == 1) {
+					if (*(udata->ub_x_off) == 0 && *(udata->ub_y_off) == 365) { //BACK BUTTON
+						printf("BACKED\n");
+						*(udata->map_x) = 800;
+						*(udata->map_y) = 600;
+						*(udata->m) = 0;
+						*(udata->map_ctr) += 1;
+						*(udata->game_mode) = 0;
+						*(udata->direct) = 2;
+					}
+					if (*(udata->ub_x_off) == 256 && *(udata->ub_y_off) == 365) { //CONTINUE BUTTON
+						*(udata->map_x) = 988;
+						*(udata->map_y) = 1062;
+						*(udata->m) = 3;
+						*(udata->map_ctr) += 1;
+						*(udata->game_mode) = 2;
+					}
+				}					
 			}
+
+			if (*(udata->game_mode) == 0 && *(udata->direct) == 2) {
+				if (*(udata->ub_y_off) == 247) { //START BUTTON
+					*(udata->map_x) = 1436;
+					*(udata->map_y) = 1293;
+					*(udata->m) = 2;
+					*(udata->map_ctr) += 1;
+					*(udata->game_mode) = 2;
+				}
+			}
+
+			
+			if (*(udata->game_mode) == 0 && *(udata->direct) != 2) {
+				if (*(udata->ub_y_off) == 247) { //START BUTTON
+					*(udata->map_x) = 1436;
+					*(udata->map_y) = 1293;
+					*(udata->m) = 2;
+					*(udata->map_ctr) += 1;
+					*(udata->game_mode) = 2;
+				}
+				if (*(udata->ub_y_off) == 365) { //UPGRADES BUTTON
+					*(udata->map_x) = 800;
+					*(udata->map_y) = 600;
+					*(udata->m) = 1;
+					*(udata->map_ctr) += 1;
+					*(udata->ub) = 2;
+					*(udata->game_mode) = 1;
+					*(udata->direct) = 1;
+				}
+			}			
 		}
 
 		//MOVEMENT
 		if (key == KB_KEY_LEFT)
 		{
 			if (*(udata->game_mode) == 1) {
+				if (*(udata->ub) == 3) {
+					*(udata->ub_x_off) -= 256;
+					*(udata->ub) = 2;
+					printf("Left\n");
+					printf("ub_x_off = %d\n", *(udata->ub_x_off));
+					printf("ub_y_off = %d\n", *(udata->ub_y_off));
+				}
+			}
+			else if (*(udata->game_mode) == 2) {
 				*(udata->dir) = 2;
 				*(udata->x_old) = *(udata->x);
 				*(udata->x) -= 10;
@@ -1088,13 +1235,22 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		else if (key == KB_KEY_RIGHT)
 		{
 			if (*(udata->game_mode) == 1) {
+				if (*(udata->ub) == 2) {  
+					*(udata->ub_x_off) += 256;
+					*(udata->ub) = 3;
+					printf("Right\n");
+					printf("ub_x_off = %d\n", *(udata->ub_x_off));
+					printf("ub_y_off = %d\n", *(udata->ub_y_off));
+				}
+			}
+			else if (*(udata->game_mode) == 2) {
 				*(udata->dir) = 3;
 				*(udata->x_old) = *(udata->x);
 				*(udata->x) += 10;
 				*(udata->s) = 3 + type_i;
 				*(udata->a) = 0;
 				printf("Right\n");
-			}
+			} 
 		}
 		else if (key == KB_KEY_UP)
 		{
@@ -1103,7 +1259,17 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->ub) = 0;
 				printf("Up\n");
 			}
-			else {
+			else if (*(udata->game_mode) == 1) {
+				if (*(udata->ub) == 3) {
+					*(udata->ub_y_off) -= 1;
+					*(udata->ub) = 4;
+					*(udata->ub_next) = 1;
+					printf("Up\n");
+					printf("ub_x_off = %d\n", *(udata->ub_x_off));
+					printf("ub_y_off = %d\n", *(udata->ub_y_off));
+				}				
+			}
+			else if (*(udata->game_mode) == 2) {
 				*(udata->dir) = 0;
 				*(udata->y_old) = *(udata->y);
 				*(udata->y) -= 10;
@@ -1119,7 +1285,17 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->ub) = 1;
 				printf("Down\n");
 			}
-			else {
+			else if (*(udata->game_mode) == 1) {
+				if (*(udata->ub) == 4) {
+					*(udata->ub_y_off) += 1;
+					*(udata->ub) = 3;
+					*(udata->ub_next) = 0;
+					printf("Down\n");
+					printf("ub_x_off = %d\n", *(udata->ub_x_off));
+					printf("ub_y_off = %d\n", *(udata->ub_y_off));
+				}
+			}
+			else if (*(udata->game_mode) == 2) {
 				*(udata->dir) = 1;
 				*(udata->y_old) = *(udata->y);
 				*(udata->y) += 10;
@@ -1924,6 +2100,12 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			*(udata->ub_y_off) = 247;
 		else if (*(udata->ub_y_off) > 365)
 			*(udata->ub_y_off) = 365;
+
+		//Upgrades Menu Boundaries
+		if (*(udata->ub_x_off) < 0)
+			*(udata->ub_x_off) = 0;
+		else if (*(udata->ub_x_off) > 256)
+			*(udata->ub_x_off) = 256;
 
 		//F2_Bedroom Walls
 		//Top
