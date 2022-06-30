@@ -27,7 +27,7 @@ typedef struct
 	//bg or maps
 	int* map_x;
 	int* map_y;
-	int *room_no;
+	int* room_no;
 	int* m;
 	int* map_ctr;
 	//cats
@@ -462,31 +462,31 @@ int main()
 		if (game_mode == 0) { //start menu
 			//if (direct == 0 || direct == 2) {
 				//bg
-				for (int i = 0; i < 106; i++)
+			for (int i = 0; i < 106; i++)
+			{
+				for (int j = 0; j < 456; j++)
 				{
-					for (int j = 0; j < 456; j++)
-					{
-						uint8_t r = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 24) + 3 * (bg_x_old + ub_x_off + j + 172) + 2];
-						uint8_t g = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 24) + 3 * (bg_x_old + ub_x_off + j + 172) + 1];
-						uint8_t b = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 24) + 3 * (bg_x_old + ub_x_off + j + 172)];
-						uint32_t pixel = (r << 16) | (g << 8) | b;
-						if (pixel)
-							buffer[map_x * (i + bg_y_old + ub_y_off + 24) + (j + bg_x_old + ub_x_off + 172)] = pixel; //-- CENTER
-					}
+					uint8_t r = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 24) + 3 * (bg_x_old + ub_x_off + j + 172) + 2];
+					uint8_t g = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 24) + 3 * (bg_x_old + ub_x_off + j + 172) + 1];
+					uint8_t b = maps[m][map_x * 3 * (i + bg_y_old + ub_y_off + 24) + 3 * (bg_x_old + ub_x_off + j + 172)];
+					uint32_t pixel = (r << 16) | (g << 8) | b;
+					if (pixel)
+						buffer[map_x * (i + bg_y_old + ub_y_off + 24) + (j + bg_x_old + ub_x_off + 172)] = pixel; //-- CENTER
 				}
-				//sprite
-				for (int i = 0; i < 106; i++)
+			}
+			//sprite
+			for (int i = 0; i < 106; i++)
+			{
+				for (int j = 0; j < 456; j++)
 				{
-					for (int j = 0; j < 456; j++)
-					{
-						uint8_t r = ui_btns[ub][456 * 3 * i + 3 * j + 2];
-						uint8_t g = ui_btns[ub][456 * 3 * i + 3 * j + 1];
-						uint8_t b = ui_btns[ub][456 * 3 * i + 3 * j];
-						uint32_t pixel = (r << 16) | (g << 8) | b;
-						if (pixel)
-							buffer[map_x * (i + bg_y + ub_y_off + 24) + (j + bg_x + ub_x_off + 172)] = pixel; //-- CENTER
-					}
+					uint8_t r = ui_btns[ub][456 * 3 * i + 3 * j + 2];
+					uint8_t g = ui_btns[ub][456 * 3 * i + 3 * j + 1];
+					uint8_t b = ui_btns[ub][456 * 3 * i + 3 * j];
+					uint32_t pixel = (r << 16) | (g << 8) | b;
+					if (pixel)
+						buffer[map_x * (i + bg_y + ub_y_off + 24) + (j + bg_x + ub_x_off + 172)] = pixel; //-- CENTER
 				}
+			}
 			//}
 
 		}
@@ -548,10 +548,10 @@ int main()
 					}
 				}
 			}
-		}		
+		}
 
 		//start playing the game
-		if (game_mode == 2){
+		if (game_mode == 2) {
 			// Redraw the background 
 			// 10k pixels
 			for (int i = 0; i < 32; i++)
@@ -1091,7 +1091,7 @@ int main()
 int generate_RandomX(int room_no)
 {
 	int num, upper, lower;
-	
+
 	if (room_no == 1) {
 		upper = 1127;
 		lower = 177;
@@ -1110,7 +1110,7 @@ int generate_RandomY(int room_no)
 		upper = 967;
 		lower = 407;
 	}
-	
+
 	//num = rand() % 1000; // should be less than map size - 30 (height of rat) 690
 	num = (rand() % (upper - lower + 1)) + lower; // (upper - lower + 1) + lower;
 	return num;
@@ -1177,7 +1177,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						*(udata->map_ctr) += 1;
 						*(udata->game_mode) = 2;
 					}
-				}					
+				}
 			}
 
 			if (*(udata->game_mode) == 0 && *(udata->direct) == 2) {
@@ -1190,7 +1190,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				}
 			}
 
-			
+
 			if (*(udata->game_mode) == 0 && *(udata->direct) != 2) {
 				if (*(udata->ub_y_off) == 247) { //START BUTTON
 					*(udata->map_x) = 1436;
@@ -1208,7 +1208,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					*(udata->game_mode) = 1;
 					*(udata->direct) = 1;
 				}
-			}			
+			}
 		}
 
 		//MOVEMENT
@@ -1235,7 +1235,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		else if (key == KB_KEY_RIGHT)
 		{
 			if (*(udata->game_mode) == 1) {
-				if (*(udata->ub) == 2) {  
+				if (*(udata->ub) == 2) {
 					*(udata->ub_x_off) += 256;
 					*(udata->ub) = 3;
 					printf("Right\n");
@@ -1250,7 +1250,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->s) = 3 + type_i;
 				*(udata->a) = 0;
 				printf("Right\n");
-			} 
+			}
 		}
 		else if (key == KB_KEY_UP)
 		{
@@ -1267,7 +1267,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					printf("Up\n");
 					printf("ub_x_off = %d\n", *(udata->ub_x_off));
 					printf("ub_y_off = %d\n", *(udata->ub_y_off));
-				}				
+				}
 			}
 			else if (*(udata->game_mode) == 2) {
 				*(udata->dir) = 0;
@@ -2123,5 +2123,335 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		if (*(udata->x) > 750)
 			*(udata->x) = 750;
 
+		// For Map 1 Object Collision
+		if (*(udata->m) == 2) {
+			// table
+			if ((*(udata->y) < 40 && *(udata->x) < -50) && (*(udata->y) < 40 && *(udata->x) > -140)) {
+				if (*(udata->y) == 30) {
+					*(udata->y) = 40;
+					*(udata->x) = *(udata->x);
+				}
+				else {
+					if (*(udata->x) == -60)
+						*(udata->x) = -50;
+					else if (*(udata->x) == -130)
+						*(udata->x) = -140;
+					*(udata->y) = *(udata->y);
+				}
+			}
+			// tree
+			if (*(udata->y) < 10 && *(udata->x) < -190) {
+				if (*(udata->y) == 0) {
+					*(udata->y) = 10;
+					*(udata->x) = *(udata->x);
+				}
+				else {
+					if (*(udata->x) == -180)
+						*(udata->x) = -190;
+					*(udata->y) = *(udata->y);
+				}
+			}
+			// shelf
+			if ((*(udata->y) > 30 && *(udata->x) < -180) && (*(udata->y) < 330 && *(udata->x) < -180)) {
+				if (*(udata->x) == -190) {
+					*(udata->y) = *(udata->y);
+					*(udata->x) = -180;
+				}
+				else {
+					if (*(udata->y) == 40)
+						*(udata->y) = 30;
+					else if (*(udata->y) == 320)
+						*(udata->y) = 330;
+					*(udata->x) = *(udata->x);
+				}
+			}
+			// workstation
+			if ((*(udata->y) > 330 && *(udata->x) < -70) && (*(udata->y) < 410 && *(udata->x) < -70)) {
+				if (*(udata->x) == -80) {
+					*(udata->y) = *(udata->y);
+					*(udata->x) = -70;
+				}
+				else {
+					if (*(udata->y) == 340)
+						*(udata->y) = 330;
+					else if (*(udata->y) == 400)
+						*(udata->y) = 410;
+					*(udata->x) = *(udata->x);
+				}
+			}
+			// drawer top
+			if ((*(udata->y) > 460 && *(udata->x) < -40) && (*(udata->y) < 510 && *(udata->x) < -40)) {
+				if (*(udata->x) == -50) {
+					*(udata->y) = *(udata->y);
+					*(udata->x) = -40;
+				}
+				else {
+					if (*(udata->y) == 470)
+						*(udata->y) = 460;
+					else if (*(udata->y) == 500)
+						*(udata->y) = 510;
+					*(udata->x) = *(udata->x);
+				}
+			}
+			// drawer middle
+			if ((*(udata->y) > 500 && *(udata->x) < -170) && (*(udata->y) < 600 && *(udata->x) < -170)) {
+				if (*(udata->x) == -180) {
+					*(udata->y) = *(udata->y);
+					*(udata->x) = -170;
+				}
+			}
+			// drawer bottom
+			if ((*(udata->y) > 590 && *(udata->x) < -70) && (*(udata->y) < 640 && *(udata->x) < -70)) {
+				if (*(udata->x) == -80) {
+					*(udata->y) = *(udata->y);
+					*(udata->x) = -70;
+				}
+				else {
+					if (*(udata->y) == 630)
+						*(udata->y) = 640;
+					else if (*(udata->y) == 600)
+						*(udata->y) = 590;
+					*(udata->x) = *(udata->x);
+				}
+			}
+			// table
+			if ((*(udata->y) > 590 && *(udata->y) < 660 && *(udata->x) < -140) && (*(udata->y) > 590 && *(udata->y) < 660 && *(udata->x) > -180)) {
+				if (*(udata->y) == 650) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 660;
+				}
+				else {
+					if (*(udata->x) == -150)
+						*(udata->x) = -140;
+					else if (*(udata->x) == -170)
+						*(udata->x) = -180;
+					*(udata->y) = *(udata->y);
+				}
+			}
+			// more shelves
+			if ((*(udata->y) > 490 && *(udata->x) > 330) && (*(udata->y) > 490 && *(udata->x) < 410)) {
+				if (*(udata->y) == 500) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 490;
+				}
+				else {
+					if (*(udata->x) == 340)
+						*(udata->x) = 330;
+					else if (*(udata->x) == 400)
+						*(udata->x) = 410;
+					*(udata->y) = *(udata->y);
+				}
+			}
+			if ((*(udata->y) > 490 && *(udata->y) < 590 && *(udata->x) > 110) && (*(udata->y) > 490 && *(udata->y) < 590 && *(udata->x) < 410)) {
+				if (*(udata->y) == 500) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 490;
+				}
+				else if (*(udata->y) == 580) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 590;
+				}
+				else {
+					if (*(udata->x) == 120)
+						*(udata->x) = 110;
+					else if (*(udata->x) == 400)
+						*(udata->x) = 410;
+					*(udata->y) = *(udata->y);
+				}
+			}
+			// dining
+			if ((*(udata->y) > 330 && *(udata->y) < 420 && *(udata->x) > 190) && (*(udata->y) > 330 && *(udata->y) < 420 && *(udata->x) < 290)) {
+				if (*(udata->y) == 340) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 330;
+				}
+				else if (*(udata->y) == 410) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 420;
+				}
+				else {
+					if (*(udata->x) == 200)
+						*(udata->x) = 190;
+					else if (*(udata->x) == 280)
+						*(udata->x) = 290;
+					*(udata->y) = *(udata->y);
+				}
+			}
+			// dividers
+			if ((*(udata->y) > 150 && *(udata->y) < 210 && *(udata->x) > 50) && (*(udata->y) > 150 && *(udata->y) < 210 && *(udata->x) < 400)) {
+				if (*(udata->y) == 160) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 150;
+				}
+				else if (*(udata->y) == 200) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 210;
+				}
+				else {
+					if (*(udata->x) == 60)
+						*(udata->x) = 50;
+					else if (*(udata->x) == 390)
+						*(udata->x) = 400;
+					*(udata->y) = *(udata->y);
+				}
+			}
+			if ((*(udata->y) > 180 && *(udata->y) < 240 && *(udata->x) > 110) && (*(udata->y) > 180 && *(udata->y) < 240 && *(udata->x) < 340)) {
+				if (*(udata->y) == 190) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 180;
+				}
+				else if (*(udata->y) == 230) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 240;
+				}
+				else {
+					if (*(udata->x) == 120)
+						*(udata->x) = 110;
+					else if (*(udata->x) == 330)
+						*(udata->x) = 340;
+					*(udata->y) = *(udata->y);
+				}
+			}
+			// harp
+			if ((*(udata->y) > 220 && *(udata->y) < 270 && *(udata->x) > 200) && (*(udata->y) > 220 && *(udata->y) < 270 && *(udata->x) < 250)) {
+				if (*(udata->y) == 230) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 220;
+				}
+				else if (*(udata->y) == 260) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 270;
+				}
+				else {
+					if (*(udata->x) == 210)
+						*(udata->x) = 200;
+					else if (*(udata->x) == 240)
+						*(udata->x) = 250;
+					*(udata->y) = *(udata->y);
+				}
+			}
+			// bed
+			if ((*(udata->y) < 100 && *(udata->x) < 260) && (*(udata->y) < 100 && *(udata->x) > 160)) {
+				if (*(udata->y) == 90) {
+					*(udata->y) = 100;
+					*(udata->x) = *(udata->x);
+				}
+				else {
+					if (*(udata->x) == 250)
+						*(udata->x) = 260;
+					else if (*(udata->x) == 170)
+						*(udata->x) = 160;
+					*(udata->y) = *(udata->y);
+				}
+			}
+			// drawer
+			if ((*(udata->y) < 20 && *(udata->x) < 420) && (*(udata->y) < 20 && *(udata->x) > 320)) {
+				if (*(udata->y) == 10) {
+					*(udata->y) = 20;
+					*(udata->x) = *(udata->x);
+				}
+				else {
+					if (*(udata->x) == 410)
+						*(udata->x) = 420;
+					else if (*(udata->x) == 330)
+						*(udata->x) = 320;
+					*(udata->y) = *(udata->y);
+				}
+			}
+			// right side
+			if ((*(udata->y) > 40 && *(udata->y) < 180 && *(udata->x) > 470) && (*(udata->y) > 40 && *(udata->y) < 180 && *(udata->x) < 570)) {
+				if (*(udata->y) == 50) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 40;
+				}
+				else if (*(udata->y) == 170) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 180;
+				}
+				else {
+					if (*(udata->x) == 480)
+						*(udata->x) = 470;
+					else if (*(udata->x) == 560)
+						*(udata->x) = 570;
+					*(udata->y) = *(udata->y);
+				}
+			}
+			if ((*(udata->y) > 150 && *(udata->y) < 210 && *(udata->x) > 490) && (*(udata->y) > 150 && *(udata->y) < 210 && *(udata->x) < 540)) {
+				if (*(udata->y) == 160) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 150;
+				}
+				else if (*(udata->y) == 200) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 210;
+				}
+				else {
+					if (*(udata->x) == 500)
+						*(udata->x) = 490;
+					else if (*(udata->x) == 530)
+						*(udata->x) = 540;
+					*(udata->y) = *(udata->y);
+				}
+			}
+			if ((*(udata->y) > 80 && *(udata->x) > 470) && (*(udata->y) < 180 && *(udata->x) > 470)) {
+				if (*(udata->x) == 480) {
+					*(udata->y) = *(udata->y);
+					*(udata->x) = 470;
+				}
+				else {
+					if (*(udata->y) == 90)
+						*(udata->y) = 80;
+					else if (*(udata->y) == 170)
+						*(udata->y) = 180;
+					*(udata->x) = *(udata->x);
+				}
+			}
+			if (*(udata->y) < 180 && *(udata->x) > 720) {
+				if (*(udata->x) == 730) {
+					*(udata->y) = *(udata->y);
+					*(udata->x) = 720;
+				}
+			}
+			if (*(udata->y) < 10 && *(udata->x) > 580) {
+				if (*(udata->x) == 590) {
+					*(udata->y) = *(udata->y);
+					*(udata->x) = 580;
+				}
+				else {
+					*(udata->y) = 10;
+					*(udata->x) = *(udata->x);
+				}
+			}
+			if ((*(udata->y) > 190 && *(udata->x) > 580) && (*(udata->y) < 290 && *(udata->x) > 580)) {
+				if (*(udata->x) == 590) {
+					*(udata->y) = *(udata->y);
+					*(udata->x) = 580;
+				}
+				else {
+					if (*(udata->y) == 200)
+						*(udata->y) = 190;
+					else if (*(udata->y) == 280)
+						*(udata->y) = 290;
+					*(udata->x) = *(udata->x);
+				}
+			}
+			if ((*(udata->y) > 490 && *(udata->y) < 650 && *(udata->x) > 480) && (*(udata->y) > 490 && *(udata->y) < 650 && *(udata->x) < 670)) {
+				if (*(udata->y) == 500) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 490;
+				}
+				else if (*(udata->y) == 640) {
+					*(udata->x) = *(udata->x);
+					*(udata->y) = 650;
+				}
+				else {
+					if (*(udata->x) == 490)
+						*(udata->x) = 480;
+					else if (*(udata->x) == 660)
+						*(udata->x) = 670;
+					*(udata->y) = *(udata->y);
+				}
+			}
+		}
 	}
 }
