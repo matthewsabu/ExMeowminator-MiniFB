@@ -6,8 +6,8 @@
 #include "include/FreeImage.h"
 
 void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isPressed);
-int generate_RandomX(int room_no);
-int generate_RandomY(int room_no);
+int generate_RandomX(int upperx, int lowerx);
+int generate_RandomY(int uppery, int lowery);
 
 typedef struct
 {
@@ -30,9 +30,13 @@ typedef struct
 	//bg or maps
 	int* map_x;
 	int* map_y;
-	int* room_no;
+	//int* room_no;
 	int* m;
 	int* map_ctr;
+	int* upperx;
+	int* lowerx;
+	int* uppery;
+	int* lowery;
 	//cats
 	int* a;
 	int* dir;
@@ -120,13 +124,17 @@ int main()
 	FreeImage_FlipVertical(fi_ui_btn6);
 	uint8_t* ui_btn6 = FreeImage_GetBits(fi_ui_btn6);
 
-	FIBITMAP* fi_bg1 = FreeImage_Load(FIF_JPEG, "assets_meow/F2_Bedroom.jpg");
+	FIBITMAP* fi_bg1 = FreeImage_Load(FIF_JPEG, "assets_meow/F1_LivingRoom.jpg");
 	FreeImage_FlipVertical(fi_bg1);
 	uint8_t* bg1 = FreeImage_GetBits(fi_bg1);
 
-	FIBITMAP* fi_bg2 = FreeImage_Load(FIF_JPEG, "assets_meow/F3_Bathroom.jpg");
+	FIBITMAP* fi_bg2 = FreeImage_Load(FIF_JPEG, "assets_meow/F2_Bedroom.jpg");
 	FreeImage_FlipVertical(fi_bg2);
 	uint8_t* bg2 = FreeImage_GetBits(fi_bg2);
+
+	FIBITMAP* fi_bg3 = FreeImage_Load(FIF_JPEG, "assets_meow/F3_Bathroom.jpg");
+	FreeImage_FlipVertical(fi_bg3);
+	uint8_t* bg3 = FreeImage_GetBits(fi_bg3);
 
 	FIBITMAP* fi_sprite2 = FreeImage_Load(FIF_PNG, "assets_meow/Bengal_Up.png");
 	FreeImage_FlipVertical(fi_sprite2);
@@ -330,19 +338,29 @@ int main()
 	srand(time(0));
 
 	do {
-		static int map_x = 800; //1436
-		static int map_y = 600; //1293
-		static int room_no = 1; //ROOM NUMBER
+		static int map_x = 800; //1436 800
+		static int map_y = 600; //1293 600
+		//static int room_no = 1; //ROOM NUMBER
 		static int m = 0;
 		static int map_ctr = 0;
 
-		uint8_t* maps[4] = { ui1, ui2, bg1, bg2 };
+		static int upperx = 0;
+		static int lowerx = 0;
+		static int uppery = 0;
+		static int lowery = 0;
+
+		uint8_t* maps[5] = { ui1, ui2, bg1, bg2, bg3 };
 
 		udata.map_x = &map_x;
 		udata.map_y = &map_y;
-		udata.room_no = &room_no;
+		//udata.room_no = &room_no;
 		udata.m = &m;
 		udata.map_ctr = &map_ctr;
+
+		udata.upperx = &upperx;
+		udata.lowerx = &lowerx;
+		udata.uppery = &uppery;
+		udata.lowery = &lowery;
 
 		if (map_ctr > 0 && map_ctr < 2) {
 			buffer = (uint32_t*)malloc(map_x * map_y * 4);
@@ -659,7 +677,7 @@ int main()
 						if (pixel)
 							buffer[map_x * (i + bg_y + ub_y_off - 64) + (j + bg_x + ub_x_off + 71)] = pixel; //-- CENTER
 					}
-				}				
+				}
 			}
 		}
 
@@ -802,11 +820,11 @@ int main()
 
 				for (int i = 0; i < 11; i++)
 				{
-					rand_xnum = generate_RandomX(room_no);
+					rand_xnum = generate_RandomX(upperx, lowerx);
 					for (int j = 0; j < 11; j++)
 					{
 						if ((rand_x[j] >= rand_xnum) && (rand_xnum <= rand_x[j] + 30)) {
-							rand_xnum = generate_RandomX(room_no);
+							rand_xnum = generate_RandomX(upperx, lowerx);
 						}
 						else {
 							rand_x[i] = rand_xnum;
@@ -815,10 +833,10 @@ int main()
 				}
 				for (int i = 0; i < 11; i++)
 				{
-					rand_ynum = generate_RandomY(room_no);
+					rand_ynum = generate_RandomY(uppery, lowery);
 					for (int j = 0; j < 11; j++) {
 						if ((rand_y[j] >= rand_ynum) && (rand_ynum <= rand_y[j] + 30)) {
-							rand_ynum = generate_RandomY(room_no);
+							rand_ynum = generate_RandomY(uppery, lowery);
 						}
 						else {
 							rand_y[i] = rand_ynum;
@@ -1031,23 +1049,6 @@ int main()
 						}
 					}
 				}
-
-				//else {
-				//	//portal sprite
-				//	for (int i = 0; i < 32; i++)
-				//	{
-				//		for (int j = 0; j < 42; j++)
-				//		{
-				//			uint8_t r = sprites[20][42 * 4 * i + 4 * j + 2];
-				//			uint8_t g = sprites[20][42 * 4 * i + 4 * j + 1];
-				//			uint8_t b = sprites[20][42 * 4 * i + 4 * j];
-				//			uint32_t pixel = (r << 16) | (g << 8) | b;
-				//			if (pixel)
-				//				buffer[map_x * (i + 284) + (j + 379)] = pixel; //-- CENTER
-				//		}
-				//	}
-				//}
-
 			}
 
 			if (wave == 2) { // second wave, 7 rats
@@ -1179,47 +1180,49 @@ int main()
 
 			//Rat Borders			
 			//Top and Bottom
-			if (ry1 == (-rand_y[0] + (map_y - 967))) { // -rand_y + (1293 - upper)
+			// [-rand_y + (1293 - uppery - cat width)]
+			// [uppery - rand_y + rat height]
+			if (ry1 == (-rand_y[0] + (map_y - uppery - 42))) {
 				ry_dir1 = 1;
 				rs1 = 1;
 			}
-			if (ry1 == (967 - rand_y[0] + 22)) {	//upper - rand_y + rat height
+			if (ry1 == (uppery - rand_y[0] + 22)) {
 				ry_dir1 = 0;
 				rs1 = 0;
 			}
 
-			if (ry2 == (-rand_y[1] + (map_y - 967))) { // -rand_y + (1293 - upper)
+			if (ry2 == (-rand_y[1] + (map_y - uppery - 42))) {
 				ry_dir2 = 1;
 				rs2 = 1;
 			}
-			if (ry2 == (967 - rand_y[1] + 22)) {	//upper - rand_y + rat height
+			if (ry2 == (uppery - rand_y[1] + 22)) {
 				ry_dir2 = 0;
 				rs2 = 0;
 			}
 
-			if (ry3 == (-rand_y[2] + (map_y - 967))) { // -rand_y + (1293 - upper)
+			if (ry3 == (-rand_y[2] + (map_y - uppery - 42))) {
 				ry_dir3 = 1;
 				rs3 = 1;
 			}
-			if (ry3 == (967 - rand_y[2] + 22)) {	//upper - rand_y + rat height
+			if (ry3 == (uppery - rand_y[2] + 22)) {
 				ry_dir3 = 0;
 				rs3 = 0;
 			}
 
-			if (ry4 == (-rand_y[3] + (map_y - 967))) { // -rand_y + (1293 - upper)
+			if (ry4 == (-rand_y[3] + (map_y - uppery - 42))) {
 				ry_dir4 = 1;
 				rs4 = 1;
 			}
-			if (ry4 == (967 - rand_y[3] + 22)) {	//upper - rand_y + rat height
+			if (ry4 == (uppery - rand_y[3] + 22)) {
 				ry_dir4 = 0;
 				rs4 = 0;
 			}
 
-			if (ry5 == (-rand_y[4] + (map_y - 967))) { // -rand_y + (1293 - upper)
+			if (ry5 == (-rand_y[4] + (map_y - uppery - 42))) {
 				ry_dir5 = 1;
 				rs5 = 1;
 			}
-			if (ry5 == (967 - rand_y[4] + 22)) {	//upper - rand_y + rat height
+			if (ry5 == (uppery - rand_y[4] + 22)) {
 				ry_dir5 = 0;
 				rs5 = 0;
 			}
@@ -1264,31 +1267,21 @@ int main()
 	return 0;
 }
 
-int generate_RandomX(int room_no)
+int generate_RandomX(int upperx, int lowerx)
 {
-	int num, upper, lower;
-
-	if (room_no == 1) {
-		upper = 1127;
-		lower = 177;
-	}
+	int num;
 
 	//num = rand() % 1100; // should be less than map size - 30 (width of rat) 750
-	num = (rand() % (upper - lower + 1)) + lower; // (upper - lower + 1) + lower;
+	num = (rand() % (upperx - lowerx + 1)) + lowerx; // (upper - lower + 1) + lower;
 	return num;
 }
 
-int generate_RandomY(int room_no)
+int generate_RandomY(int uppery, int lowery)
 {
-	int num, upper, lower;
-
-	if (room_no == 1) {
-		upper = 967;
-		lower = 407;
-	}
+	int num;
 
 	//num = rand() % 1000; // should be less than map size - 30 (height of rat) 690
-	num = (rand() % (upper - lower + 1)) + lower; // (upper - lower + 1) + lower;
+	num = (rand() % (uppery - lowery + 1)) + lowery; // (upper - lower + 1) + lower;
 	return num;
 }
 
@@ -1323,6 +1316,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->map_ctr) += 1;
 				//printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
 				*(udata->ub_y_off) += 200;
+				//*(udata->ub_next) = 0;
 				*(udata->ub) = 2; //back
 				*(udata->game_mode) = 1;
 				printf("game_mode = %d\n", *(udata->game_mode));
@@ -1332,7 +1326,6 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		if (key == KB_KEY_ENTER && *(udata->game_mode) == 1) {
 			//if (*(udata->game_mode) == 1) {
 				//printf("BACK NOW x= %d\n", *(udata->ub_x_off));
-				//printf("BACK NOW y= %d\n", *(udata->ub_y_off));
 				//if (*(udata->direct) == 1) {
 			if (*(udata->ub_x_off) == 0 && *(udata->ub_y_off) == 365) { //BACK BUTTON
 				printf("BACKED\n");
@@ -1345,9 +1338,16 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->direct) = 2;
 			}
 			if (*(udata->ub_x_off) == 256 && *(udata->ub_y_off) == 365) { //CONTINUE BUTTON
-				*(udata->map_x) = 988;
-				*(udata->map_y) = 1062;
-				*(udata->m) = 3;
+				//*(udata->map_x) = 988;
+				//*(udata->map_y) = 1062;
+				//*(udata->m) = 4;
+				*(udata->map_x) = 1468;
+				*(udata->map_y) = 1216;
+				*(udata->m) = 2;
+				*(udata->upperx) = 1239;
+				*(udata->lowerx) = 219;
+				*(udata->uppery) = 874;
+				*(udata->lowery) = 284;
 				*(udata->map_ctr) += 1;
 				*(udata->game_mode) = 2;
 			}
@@ -1356,7 +1356,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					*(udata->u_select) = 1;
 				}
 				else {
-					*(udata->u_select) == 0;
+					*(udata->u_select) = 0;
 				}
 				printf("select5 = %d\n", *(udata->u_select));
 			}
@@ -1372,21 +1372,14 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		}
 
 		if (key == KB_KEY_ENTER && *(udata->game_mode) == 0) {
-			//if (*(udata->game_mode) == 0 && *(udata->direct) == 2) {
-			//	if (*(udata->ub_y_off) == 247) { //START BUTTON
-			//		*(udata->map_x) = 1436;
-			//		*(udata->map_y) = 1293;
-			//		*(udata->m) = 2;
-			//		*(udata->map_ctr) += 1;
-			//		*(udata->game_mode) = 2;
-			//	}
-			//}
-
-			//if (*(udata->game_mode) == 0 && *(udata->direct) != 2) {
 			if (*(udata->ub_y_off) == 247) { //START BUTTON
 				*(udata->map_x) = 1436;
 				*(udata->map_y) = 1293;
-				*(udata->m) = 2;
+				*(udata->m) = 3;
+				*(udata->upperx) = 1127;
+				*(udata->lowerx) = 177;
+				*(udata->uppery) = 967;
+				*(udata->lowery) = 407;
 				*(udata->map_ctr) += 1;
 				*(udata->game_mode) = 2;
 			}
@@ -1397,9 +1390,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->map_ctr) += 1;
 				*(udata->ub) = 2;
 				*(udata->game_mode) = 1;
-				//*(udata->direct) = 1;
 			}
-			//}
 		}
 
 		//MOVEMENT
@@ -1758,7 +1749,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			else if (*(udata->game_mode) == 2) {
 				*(udata->dir) = 1;
 				*(udata->y_old) = *(udata->y);
-				if(*(udata->speed_lvl) == 0)
+				if (*(udata->speed_lvl) == 0)
 					*(udata->y) += 10;
 				else if (*(udata->speed_lvl) == 1)
 					*(udata->y) += 12;
@@ -2396,8 +2387,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			//[rand x - cat x offset - cat width]
 			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
 			if (*(udata->a) != 0) {
-				if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  
-					if (*(udata->y) >= (rand_y[0] - 284 - 32 + *(udata->ry1)) && *(udata->y) <= (rand_y[0] - 284 + *(udata->ry1))) { 
+				if (*(udata->x) >= (rand_x[0] - 379 - 42)) {
+					if (*(udata->y) >= (rand_y[0] - 284 - 32 + *(udata->ry1)) && *(udata->y) <= (rand_y[0] - 284 + *(udata->ry1))) {
 						*(udata->hp_pos) = 0;
 						*(udata->r1_hp) -= 2;
 						//Easy Rat counts as 1 kill
@@ -2406,7 +2397,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[1] - 379 - 42)) { 
+				if (*(udata->x) >= (rand_x[1] - 379 - 42)) {
 					if (*(udata->y) >= (rand_y[1] - 284 - 32 + *(udata->ry2)) && *(udata->y) <= (rand_y[1] - 284 + *(udata->ry2))) {
 						*(udata->hp_pos) = 1;
 						*(udata->r2_hp) -= 2;
@@ -2416,7 +2407,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  
+				if (*(udata->x) >= (rand_x[2] - 379 - 42)) {
 					if (*(udata->y) >= (rand_y[2] - 284 - 32 + *(udata->ry3)) && *(udata->y) <= (rand_y[2] - 284 + *(udata->ry3))) {
 						*(udata->hp_pos) = 2;
 						*(udata->r3_hp) -= 2;
@@ -2426,7 +2417,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[3] - 379 - 42)) {  
+				if (*(udata->x) >= (rand_x[3] - 379 - 42)) {
 					if (*(udata->y) >= (rand_y[3] - 284 - 32 + *(udata->ry4)) && *(udata->y) <= (rand_y[3] - 284 + *(udata->ry4))) {
 						*(udata->hp_pos) = 3;
 						*(udata->r4_hp) -= 2;
@@ -2436,7 +2427,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  
+				if (*(udata->x) >= (rand_x[4] - 379 - 42)) {
 					if (*(udata->y) >= (rand_y[4] - 284 - 32 + *(udata->ry5)) && *(udata->y) <= (rand_y[4] - 284 + *(udata->ry5))) {
 						*(udata->hp_pos) = 4;
 						*(udata->r5_hp) -= 2;
@@ -2718,35 +2709,38 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		}
 
 		//Start Menu Boundaries
-		if (*(udata->ub_y_off) < 247)
-			*(udata->ub_y_off) = 247;
-		else if (*(udata->ub_y_off) > 365)
-			*(udata->ub_y_off) = 365;
+		if (*(udata->m) == 0) {
+			if (*(udata->ub_y_off) < 247)
+				*(udata->ub_y_off) = 247;
+			else if (*(udata->ub_y_off) > 365)
+				*(udata->ub_y_off) = 365;
+		}
 
 		//Upgrades Menu Boundaries
-		if (*(udata->ub_x_off) < 0)
-			*(udata->ub_x_off) = 0;
-		else if (*(udata->ub_x_off) > 256)
-			*(udata->ub_x_off) = 256;
-
-		//F2_Bedroom Walls
-		//Top
-		if (*(udata->y) < 0)
-			*(udata->y) = 0;
-		if (*(udata->x) < 0 && *(udata->y) == 0)
-			*(udata->x) = 0;
-		//Bottom
-		if (*(udata->y) > 690)
-			*(udata->y) = 690;
-		//Left
-		if (*(udata->x) < -200)
-			*(udata->x) = -200;
-		//Right
-		if (*(udata->x) > 750)
-			*(udata->x) = 750;
+		if (*(udata->m) == 1) {
+			if (*(udata->ub_x_off) < 0)
+				*(udata->ub_x_off) = 0;
+			else if (*(udata->ub_x_off) > 256)
+				*(udata->ub_x_off) = 256;
+		}
 
 		// For Map 1 Object Collision
-		if (*(udata->m) == 2) {
+		if (*(udata->m) == 3) {
+			//F2_Bedroom Walls
+			//Top
+			if (*(udata->y) < 0)
+				*(udata->y) = 0;
+			if (*(udata->x) < 0 && *(udata->y) == 0)
+				*(udata->x) = 0;
+			//Bottom
+			if (*(udata->y) > 690)
+				*(udata->y) = 690;
+			//Left
+			if (*(udata->x) < -200)
+				*(udata->x) = -200;
+			//Right
+			if (*(udata->x) > 750)
+				*(udata->x) = 750;
 			// table
 			if ((*(udata->y) < 40 && *(udata->x) < -50) && (*(udata->y) < 40 && *(udata->x) > -140)) {
 				if (*(udata->y) == 30) {
