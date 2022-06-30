@@ -570,6 +570,20 @@ int main()
 
 		//start playing the game
 		if (game_mode == 2) {
+			//bg
+			for (int i = 0; i < 32; i++)
+			{
+				for (int j = 0; j < 42; j++)
+				{
+					uint8_t r = maps[m][map_x * 3 * (i + bg_y_old + 284) + 3 * (bg_x_old + j + 379) + 2];
+					uint8_t g = maps[m][map_x * 3 * (i + bg_y_old + 284) + 3 * (bg_x_old + j + 379) + 1];
+					uint8_t b = maps[m][map_x * 3 * (i + bg_y_old + 284) + 3 * (bg_x_old + j + 379)];
+					uint32_t pixel = (r << 16) | (g << 8) | b;
+					if (pixel)
+						buffer[map_x * (i + bg_y_old + 284) + (j + bg_x_old + 379)] = pixel; //-- CENTER
+				}
+			}
+
 			if(dead == 1) {
 				//portal sprite
 				for (int i = 0; i < 32; i++)
@@ -583,20 +597,6 @@ int main()
 						if (pixel)
 							buffer[map_x * (i + 284) + (j + 379)] = pixel; //-- CENTER
 					}
-				}
-			}
-
-			//bg
-			for (int i = 0; i < 32; i++)
-			{
-				for (int j = 0; j < 42; j++)
-				{
-					uint8_t r = maps[m][map_x * 3 * (i + bg_y_old + 284) + 3 * (bg_x_old + j + 379) + 2];
-					uint8_t g = maps[m][map_x * 3 * (i + bg_y_old + 284) + 3 * (bg_x_old + j + 379) + 1];
-					uint8_t b = maps[m][map_x * 3 * (i + bg_y_old + 284) + 3 * (bg_x_old + j + 379)];
-					uint32_t pixel = (r << 16) | (g << 8) | b;
-					if (pixel)
-						buffer[map_x * (i + bg_y_old + 284) + (j + bg_x_old + 379)] = pixel; //-- CENTER
 				}
 			}
 
@@ -1178,23 +1178,26 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		//}		
 
 		//Menu Keys
-		if (key == KB_KEY_ENTER) {
-			if (*(udata->game_mode) == 2) {
-				if (*(udata->x) == 0 && *(udata->y) == 0) {
-					*(udata->map_x) = 800;
-					*(udata->map_y) = 600;
-					//*(udata->map_change) = 1;
-					*(udata->m) = 1;
-					*(udata->map_ctr) += 1;
-					//printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
-					*(udata->game_mode) = 1;
-				}
+		if (key == KB_KEY_ENTER && *(udata->game_mode) == 2) {
+			if (*(udata->x) == 0 && *(udata->y) == 0) {
+				*(udata->map_x) = 800;
+				*(udata->map_y) = 600;
+				//*(udata->map_change) = 1;
+				*(udata->m) = 1;
+				*(udata->map_ctr) += 1;
+				//printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
+				*(udata->ub_y_off) += 200;
+				*(udata->ub) = 2; //back
+				*(udata->game_mode) = 1;
+				printf("game_mode = %d\n", *(udata->game_mode));
 			}
+		}
 
-			if (*(udata->game_mode) == 1) {
+		if (key == KB_KEY_ENTER && *(udata->game_mode) == 1) {
+			//if (*(udata->game_mode) == 1) {
 				//printf("BACK NOW x= %d\n", *(udata->ub_x_off));
 				//printf("BACK NOW y= %d\n", *(udata->ub_y_off));
-				if (*(udata->direct) == 1) {
+				//if (*(udata->direct) == 1) {
 					if (*(udata->ub_x_off) == 0 && *(udata->ub_y_off) == 365) { //BACK BUTTON
 						printf("BACKED\n");
 						*(udata->map_x) = 800;
@@ -1211,10 +1214,22 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						*(udata->map_ctr) += 1;
 						*(udata->game_mode) = 2;
 					}
-				}
-			}
+				//}
+			//}
+		}
 
-			if (*(udata->game_mode) == 0 && *(udata->direct) == 2) {
+		if (key == KB_KEY_ENTER && *(udata->game_mode) == 0) {
+			//if (*(udata->game_mode) == 0 && *(udata->direct) == 2) {
+			//	if (*(udata->ub_y_off) == 247) { //START BUTTON
+			//		*(udata->map_x) = 1436;
+			//		*(udata->map_y) = 1293;
+			//		*(udata->m) = 2;
+			//		*(udata->map_ctr) += 1;
+			//		*(udata->game_mode) = 2;
+			//	}
+			//}
+
+			//if (*(udata->game_mode) == 0 && *(udata->direct) != 2) {
 				if (*(udata->ub_y_off) == 247) { //START BUTTON
 					*(udata->map_x) = 1436;
 					*(udata->map_y) = 1293;
@@ -1222,26 +1237,16 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					*(udata->map_ctr) += 1;
 					*(udata->game_mode) = 2;
 				}
-			}
-			
-			if (*(udata->game_mode) == 0 && *(udata->direct) != 2) {
-				if (*(udata->ub_y_off) == 247) { //START BUTTON
-					*(udata->map_x) = 1436;
-					*(udata->map_y) = 1293;
-					*(udata->m) = 2;
-					*(udata->map_ctr) += 1;
-					*(udata->game_mode) = 2;
-				}
-				if (*(udata->ub_y_off) == 365) { //UPGRADES BUTTON
+				if (*(udata->ub_y_off) == 365 && *(udata->direct) != 2) { //UPGRADES BUTTON
 					*(udata->map_x) = 800;
 					*(udata->map_y) = 600;
 					*(udata->m) = 1;
 					*(udata->map_ctr) += 1;
 					*(udata->ub) = 2;
 					*(udata->game_mode) = 1;
-					*(udata->direct) = 1;
+					//*(udata->direct) = 1;
 				}
-			}
+			//}
 		}
 
 		//MOVEMENT
@@ -1251,7 +1256,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				if (*(udata->ub) == 3) {
 					*(udata->ub_x_off) -= 256;
 					*(udata->ub) = 2;
-					printf("Left\n");
+					printf("Left game mode 1\n");
 					printf("ub_x_off = %d\n", *(udata->ub_x_off));
 					printf("ub_y_off = %d\n", *(udata->ub_y_off));
 				}
@@ -1279,7 +1284,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				if (*(udata->ub) == 2) {
 					*(udata->ub_x_off) += 256;
 					*(udata->ub) = 3;
-					printf("Right\n");
+					printf("Right game mode 1\n");
 					printf("ub_x_off = %d\n", *(udata->ub_x_off));
 					printf("ub_y_off = %d\n", *(udata->ub_y_off));
 				}
@@ -1307,6 +1312,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->ub_y_off) -= 118;
 				*(udata->ub) = 0;
 				printf("Up\n");
+				*(udata->direct) = 0;
 			}
 			else if (*(udata->game_mode) == 1) {
 				if (*(udata->ub) == 3) {
