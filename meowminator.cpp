@@ -30,13 +30,13 @@ typedef struct
 	//bg or maps
 	int* map_x;
 	int* map_y;
-	//int* room_no;
 	int* m;
 	int* map_ctr;
 	int* upperx;
 	int* lowerx;
 	int* uppery;
 	int* lowery;
+	//int* room_next;
 	//cats
 	int* a;
 	int* dir;
@@ -45,6 +45,7 @@ typedef struct
 	//int *rx_dir;
 	//int *ry_dir;
 	//int *rx;
+	int* randomizer;
 	int* ry1;
 	int* ry2;
 	int* ry3;
@@ -60,6 +61,7 @@ typedef struct
 	int* r3_hp;
 	int* r4_hp;
 	int* r5_hp;
+	int* dead;
 	//kill count
 	int* weapontaken;
 	int* kill_count;
@@ -70,13 +72,11 @@ typedef struct
 	int* heart_1;
 } user_data;
 
-int randomizer = 1; // RANDOMIZE ONCE ONLY
 int rand_xnum = 0; //-200
 int rand_ynum = 0; //30
 int rand_x[11] = {};
 int rand_y[11] = {};
 
-int dead = 0;
 //int rand_weapon = rand() % (2 + 1 - 0) + 0; //need to improve on this since its too small ung range. also needs to randomize per wave
 int rand_weapon;
 
@@ -340,9 +340,9 @@ int main()
 	do {
 		static int map_x = 800; //1436 800
 		static int map_y = 600; //1293 600
-		//static int room_no = 1; //ROOM NUMBER
 		static int m = 0;
 		static int map_ctr = 0;
+		//static int room_next = 0; //# OF ROOMS DONE
 
 		static int upperx = 0;
 		static int lowerx = 0;
@@ -356,6 +356,7 @@ int main()
 		//udata.room_no = &room_no;
 		udata.m = &m;
 		udata.map_ctr = &map_ctr;
+		//udata.room_next = &room_next;
 
 		udata.upperx = &upperx;
 		udata.lowerx = &lowerx;
@@ -392,6 +393,8 @@ int main()
 		static int a = 0;
 		static int dir = 1;
 		static int cat_type = 1;
+
+		static int randomizer = 1; // RANDOMIZE ONCE ONLY
 
 		static int rx_dir1 = 2; //0 - left | 1 - right | 2 - no movement
 		static int ry_dir1 = 0; //0 - up | 1 - down | 2 - no movement
@@ -436,6 +439,7 @@ int main()
 		static int wave = 1; // change to test wave 1, wave 2, wave 3
 		static int rat_hp[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		static int hp_pos = 10;
+		static int dead = 0;
 
 		static int kill_count = 0;
 		static int weapontaken = 0;
@@ -480,6 +484,8 @@ int main()
 		udata.dir = &dir;
 		udata.cat_type = &cat_type;
 
+		udata.randomizer = &randomizer;
+
 		//udata.rx_dir = &rx_dir;
 		//udata.ry_dir = &ry_dir;
 		//udata.rx = &rx;
@@ -499,6 +505,7 @@ int main()
 		udata.r3_hp = &r3_hp;
 		udata.r4_hp = &r4_hp;
 		udata.r5_hp = &r5_hp;
+		udata.dead = &dead;
 
 		udata.kill_count = &kill_count;
 		udata.weapontaken = &weapontaken;
@@ -1315,11 +1322,13 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->m) = 1;
 				*(udata->map_ctr) += 1;
 				//printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
-				*(udata->ub_y_off) += 200;
-				//*(udata->ub_next) = 0;
+				*(udata->ub_y_off) += 118;
+				*(udata->direct) = 1;
 				*(udata->ub) = 2; //back
 				*(udata->game_mode) = 1;
 				printf("game_mode = %d\n", *(udata->game_mode));
+				*(udata->dead) = 0;
+				*(udata->randomizer) = 1;
 			}
 		}
 
@@ -1327,7 +1336,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			//if (*(udata->game_mode) == 1) {
 				//printf("BACK NOW x= %d\n", *(udata->ub_x_off));
 				//if (*(udata->direct) == 1) {
-			if (*(udata->ub_x_off) == 0 && *(udata->ub_y_off) == 365) { //BACK BUTTON
+			if (*(udata->ub_x_off) == 0 && *(udata->ub_y_off) == 365 && *(udata->direct) != 1) { //BACK BUTTON
 				printf("BACKED\n");
 				*(udata->map_x) = 800;
 				*(udata->map_y) = 600;
@@ -1336,6 +1345,9 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->ub) = 1; //upgrade
 				*(udata->game_mode) = 0;
 				*(udata->direct) = 2;
+			}
+			if (*(udata->direct) == 1) {
+				*(udata->direct) = 0;
 			}
 			if (*(udata->ub_x_off) == 256 && *(udata->ub_y_off) == 365) { //CONTINUE BUTTON
 				//*(udata->map_x) = 988;
@@ -1390,6 +1402,9 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->map_ctr) += 1;
 				*(udata->ub) = 2;
 				*(udata->game_mode) = 1;
+			}
+			if (*(udata->direct) == 2) {
+				*(udata->direct) = 0;
 			}
 		}
 
