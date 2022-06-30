@@ -36,7 +36,7 @@ typedef struct
 	int* lowerx;
 	int* uppery;
 	int* lowery;
-	//int* room_next;
+	int* room_next;
 	//cats
 	int* a;
 	int* dir;
@@ -342,7 +342,7 @@ int main()
 		static int map_y = 600; //1293 600
 		static int m = 0;
 		static int map_ctr = 0;
-		//static int room_next = 0; //# OF ROOMS DONE
+		static int room_next = 0; //# OF ROOMS DONE
 
 		static int upperx = 0;
 		static int lowerx = 0;
@@ -353,10 +353,9 @@ int main()
 
 		udata.map_x = &map_x;
 		udata.map_y = &map_y;
-		//udata.room_no = &room_no;
 		udata.m = &m;
 		udata.map_ctr = &map_ctr;
-		//udata.room_next = &room_next;
+		udata.room_next = &room_next;
 
 		udata.upperx = &upperx;
 		udata.lowerx = &lowerx;
@@ -704,7 +703,7 @@ int main()
 				}
 			}
 
-			if (dead == 1) {
+			if (dead == 1 && room_next == 0) {
 				//portal sprite
 				for (int i = 0; i < 32; i++)
 				{
@@ -854,8 +853,10 @@ int main()
 			}
 
 			if (rat_hp[0] <= 0 && rat_hp[1] <= 0 && rat_hp[2] <= 0 && rat_hp[3] <= 0 && rat_hp[4] <= 0 &&
-				rat_hp[5] <= 0 && rat_hp[6] <= 0 && rat_hp[7] <= 0 && rat_hp[8] <= 0 && rat_hp[9] <= 0)
+				rat_hp[5] <= 0 && rat_hp[6] <= 0 && rat_hp[7] <= 0 && rat_hp[8] <= 0 && rat_hp[9] <= 0) {
 				dead = 1;
+				room_next = 0;
+			}
 
 			for (int i = 0; i < 10; i++) {
 				printf("rat_hp[%d] = %d\n", i, rat_hp[i]);
@@ -1319,13 +1320,21 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->map_x) = 800;
 				*(udata->map_y) = 600;
 				//*(udata->map_change) = 1;
+				if (*(udata->m) == 3) *(udata->ub_y_off) += 118;
+				else if (*(udata->m) == 2) {
+					*(udata->ub_x_off) -= 271;
+				}
 				*(udata->m) = 1;
 				*(udata->map_ctr) += 1;
 				//printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
-				*(udata->ub_y_off) += 118;
 				*(udata->direct) = 1;
 				*(udata->ub) = 2; //back
 				*(udata->game_mode) = 1;
+				if (*(udata->room_next) == 1) {
+					*(udata->room_next) = 0;
+				} else {
+					*(udata->room_next) = 1;
+				}
 				printf("game_mode = %d\n", *(udata->game_mode));
 				*(udata->dead) = 0;
 				*(udata->randomizer) = 1;
