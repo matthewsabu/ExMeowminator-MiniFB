@@ -61,12 +61,12 @@ typedef struct
 int randomizer = 1; // RANDOMIZE ONCE ONLY
 int rand_xnum = 0; //-200
 int rand_ynum = 0; //30
-int rand_x[12] = {};
-int rand_y[12] = {};
+int rand_x[11] = {};
+int rand_y[11] = {};
 
 int dead = 0;
-int rand_weapon = rand() % (2 + 1 - 0) + 0; //need to improve on this since its too small ung range. also needs to randomize per wave
-
+//int rand_weapon = rand() % (2 + 1 - 0) + 0; //need to improve on this since its too small ung range. also needs to randomize per wave
+int rand_weapon;
 
 int main()
 {
@@ -430,8 +430,8 @@ int main()
 		uint8_t* ui_btns[5] = { ui_btn1, ui_btn2, ui_btn3, ui_btn4, ui_btn5 };
 
 		uint8_t* sprites[21] = { sprite2, sprite3, sprite4, sprite5, sprite6, sprite7, sprite8, sprite9, sprite10, sprite11, sprite12, sprite13, sprite14, sprite15, sprite16, sprite17, sprite18, sprite19, sprite20, sprite21, sprite44 };
-		uint8_t* attacks[12] = { NoAttack , light_attack, bite, furball_spit, mega_meow, tail_slap, telekinesis, flamethrower_attack, sword_attack  , taser_attack };
-		uint8_t* weapons[5] = { sword, flamethrower, taser };
+		uint8_t* attacks[12] = { NoAttack , light_attack, bite, furball_spit, mega_meow, tail_slap, telekinesis, flamethrower_attack, sword_attack, taser_attack };
+		uint8_t* weapons[3] = { flamethrower, sword, taser };
 
 		uint8_t* easy[4] = { sprite32, sprite33, sprite34, sprite35 };
 		uint8_t* medium[4] = { sprite36, sprite37, sprite38, sprite39 };
@@ -479,7 +479,7 @@ int main()
 
 		if (game_mode == 0) { //start menu
 			//if (direct == 0 || direct == 2) {
-				//bg
+			//bg
 			for (int i = 0; i < 106; i++)
 			{
 				for (int j = 0; j < 456; j++)
@@ -492,7 +492,7 @@ int main()
 						buffer[map_x * (i + bg_y_old + ub_y_off + 24) + (j + bg_x_old + ub_x_off + 172)] = pixel; //-- CENTER
 				}
 			}
-			//sprite
+			//btn sprite
 			for (int i = 0; i < 106; i++)
 			{
 				for (int j = 0; j < 456; j++)
@@ -524,7 +524,7 @@ int main()
 							buffer[map_x * (i + bg_y_old + ub_y_off + 157) + (j + bg_x_old + ub_x_off + 143)] = pixel; //-- CENTER
 					}
 				}
-				//sprite
+				//btn sprite
 				for (int i = 0; i < 52; i++)
 				{
 					for (int j = 0; j < 260; j++)
@@ -552,7 +552,7 @@ int main()
 							buffer[map_x * (i + bg_y_old + ub_y_off + 100) + (j + bg_x_old + ub_x_off + 208)] = pixel; //-- CENTER
 					}
 				}
-				//sprite
+				//btn sprite
 				for (int i = 0; i < 32; i++)
 				{
 					for (int j = 0; j < 160; j++)
@@ -570,8 +570,23 @@ int main()
 
 		//start playing the game
 		if (game_mode == 2) {
-			// Redraw the background 
-			// 10k pixels
+			if(dead == 1) {
+				//portal sprite
+				for (int i = 0; i < 32; i++)
+				{
+					for (int j = 0; j < 42; j++)
+					{
+						uint8_t r = sprites[20][42 * 4 * i + 4 * j + 2];
+						uint8_t g = sprites[20][42 * 4 * i + 4 * j + 1];
+						uint8_t b = sprites[20][42 * 4 * i + 4 * j];
+						uint32_t pixel = (r << 16) | (g << 8) | b;
+						if (pixel)
+							buffer[map_x * (i + 284) + (j + 379)] = pixel; //-- CENTER
+					}
+				}
+			}
+
+			//bg
 			for (int i = 0; i < 32; i++)
 			{
 				for (int j = 0; j < 42; j++)
@@ -585,9 +600,8 @@ int main()
 				}
 			}
 
-			// Change sprite used depending on direction
-			// Draws the sprite over the background in the framebuffer
-			// 10k pixels
+			//cat sprite
+			//Change sprite used depending on direction
 			for (int i = 0; i < 32; i++)
 			{
 				for (int j = 0; j < 42; j++)
@@ -602,8 +616,7 @@ int main()
 			}
 
 			if (dir == 3) {
-				// Draws the attack over the background in the framebuffer
-				// 10k pixels
+				//attack
 				for (int i = 0; i < 20; i++)
 				{
 					for (int j = 0; j < 20; j++)
@@ -618,8 +631,7 @@ int main()
 				}
 			}
 			else if (dir == 2) {
-				// Draws the attack over the background in the framebuffer
-				// 10k pixels
+				//attack
 				for (int i = 0; i < 20; i++)
 				{
 					for (int j = 0; j < 20; j++)
@@ -634,8 +646,7 @@ int main()
 				}
 			}
 			else if (dir == 1) {
-				// Draws the attack over the background in the framebuffer
-				// 10k pixels
+				//attack
 				for (int i = 0; i < 20; i++)
 				{
 					for (int j = 0; j < 20; j++)
@@ -650,8 +661,7 @@ int main()
 				}
 			}
 			else if (dir == 0) {
-				// Draws the attack over the background in the framebuffer
-				// 10k pixels
+				//attack
 				for (int i = 0; i < 20; i++)
 				{
 					for (int j = 0; j < 20; j++)
@@ -681,6 +691,7 @@ int main()
 
 			if (randomizer) {
 				if (wave == 1) {
+					rand_weapon = rand() % (2 + 1 - 0) + 0;
 					r1_hp = 1;
 					r2_hp = 1;
 					r3_hp = 1;
@@ -694,10 +705,10 @@ int main()
 						rat_hp[i] = 0;
 				}
 
-				for (int i = 0; i < 12; i++)
+				for (int i = 0; i < 11; i++)
 				{
 					rand_xnum = generate_RandomX(room_no);
-					for (int j = 0; j < 12; j++)
+					for (int j = 0; j < 11; j++)
 					{
 						if ((rand_x[j] >= rand_xnum) && (rand_xnum <= rand_x[j] + 30)) {
 							rand_xnum = generate_RandomX(room_no);
@@ -707,10 +718,10 @@ int main()
 						}
 					}
 				}
-				for (int i = 0; i < 12; i++)
+				for (int i = 0; i < 11; i++)
 				{
 					rand_ynum = generate_RandomY(room_no);
-					for (int j = 0; j < 12; j++) {
+					for (int j = 0; j < 11; j++) {
 						if ((rand_y[j] >= rand_ynum) && (rand_ynum <= rand_y[j] + 30)) {
 							rand_ynum = generate_RandomY(room_no);
 						}
@@ -730,16 +741,14 @@ int main()
 				printf("rat_hp[%d] = %d\n", i, rat_hp[i]);
 			}
 
-			//for (int i = 0; i < 10; i++) {
+			//for (int i = 0; i < 11; i++) {
 			//	printf("X [%d] = %d\n", i, rand_x[i]);
 			//}
-			//for (int j = 0; j < 10; j++) {
+			//for (int j = 0; j < 11; j++) {
 			//	printf("Y [%d] = %d\n", j, rand_y[j]);
 			//}
-			printf("X [%d] = %d\n", 0, rand_x[0]);
-			printf("Y [%d] = %d\n", 0, rand_y[0]);
-			printf("X [%d] = %d\n", 4, rand_x[4]);
-			printf("Y [%d] = %d\n", 4, rand_y[4]);
+			//printf("X [%d] = %d\n", 11, rand_x[11]);
+			//printf("Y [%d] = %d\n", 11, rand_y[11]);
 
 			if (wave == 1) { // first wave, 5 rats
 				if (weapontaken == 0) { //it just spawns
@@ -753,7 +762,7 @@ int main()
 							uint8_t b = weapons[rand_weapon][44 * 4 * i + 4 * j];
 							uint32_t pixel = (r << 16) | (g << 8) | b;
 							if (pixel)
-								buffer[map_x * (i + rand_y[11]) + (j + rand_x[11])] = pixel;
+								buffer[map_x * (i + rand_y[10]) + (j + rand_x[10])] = pixel;
 						}
 					}
 
@@ -928,22 +937,21 @@ int main()
 					}
 				}
 
-				else {
-					// Draws the sprite over the background in the framebuffer
-					// 10k pixels
-					for (int i = 0; i < 32; i++)
-					{
-						for (int j = 0; j < 42; j++)
-						{
-							uint8_t r = sprites[20][42 * 4 * i + 4 * j + 2];
-							uint8_t g = sprites[20][42 * 4 * i + 4 * j + 1];
-							uint8_t b = sprites[20][42 * 4 * i + 4 * j];
-							uint32_t pixel = (r << 16) | (g << 8) | b;
-							if (pixel)
-								buffer[map_x * (i + 284) + (j + 379)] = pixel; //-- CENTER
-						}
-					}
-				}
+				//else {
+				//	//portal sprite
+				//	for (int i = 0; i < 32; i++)
+				//	{
+				//		for (int j = 0; j < 42; j++)
+				//		{
+				//			uint8_t r = sprites[20][42 * 4 * i + 4 * j + 2];
+				//			uint8_t g = sprites[20][42 * 4 * i + 4 * j + 1];
+				//			uint8_t b = sprites[20][42 * 4 * i + 4 * j];
+				//			uint32_t pixel = (r << 16) | (g << 8) | b;
+				//			if (pixel)
+				//				buffer[map_x * (i + 284) + (j + 379)] = pixel; //-- CENTER
+				//		}
+				//	}
+				//}
 
 			}
 
@@ -1084,7 +1092,6 @@ int main()
 			}
 
 			//Left and Right
-
 			printf("rx = %d\n", rx1);
 			printf("ry = %d\n\n", ry1);
 
@@ -1161,15 +1168,6 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 	if (isPressed)
 	{
 		//MAPS
-		if (key == KB_KEY_N) {
-			*(udata->map_x) = 1436;
-			*(udata->map_y) = 1293;
-			//*(udata->map_change) = 0;
-			*(udata->m) = 2;
-			*(udata->map_ctr) += 1;
-			printf("CHANGING MAP! = %d\n", *(udata->map_ctr));
-		}
-
 		//if (key == KB_KEY_M) {
 		//	*(udata->map_x) = 988;
 		//	*(udata->map_y) = 1062;
@@ -1225,8 +1223,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					*(udata->game_mode) = 2;
 				}
 			}
-
-
+			
 			if (*(udata->game_mode) == 0 && *(udata->direct) != 2) {
 				if (*(udata->ub_y_off) == 247) { //START BUTTON
 					*(udata->map_x) = 1436;
@@ -1266,14 +1263,14 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->s) = 2 + type_i;
 				*(udata->a) = 0;
 				printf("Left\n");
+				//Pick up Weapon
+				//if (*(udata->x) >= (rand_x[10] - 379 - 44)) { 
+				//	if (*(udata->y) >= (rand_y[10]) - 284 - 32 && *(udata->y) <= (rand_y[10]) - 284) {
+				//		*(udata->weapontaken) = 1;
+				//		specialattack_i = rand_weapon;
 
-				if (*(udata->x) >= (rand_x[11] - 379 - 44)) {  //rand x - cat x offset - cat width
-					if (*(udata->y) >= (rand_y[11]) - 284 - 32 && *(udata->y) <= (rand_y[11]) - 284) {
-						*(udata->weapontaken) = 1;
-						specialattack_i = rand_weapon;
-
-					}
-				}
+				//	}
+				//}
 			}
 		}
 		else if (key == KB_KEY_RIGHT)
@@ -1294,14 +1291,14 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->s) = 3 + type_i;
 				*(udata->a) = 0;
 				printf("Right\n");
+				//Pick up Weapon
+				//if (*(udata->x) >= (rand_x[10] - 379 - 44)) { 
+				//	if (*(udata->y) >= (rand_y[10]) - 284 - 32 && *(udata->y) <= (rand_y[10]) - 284) {
+				//		*(udata->weapontaken) = 1;
+				//		specialattack_i = rand_weapon;
 
-				if (*(udata->x) >= (rand_x[11] - 379 - 44)) {  //rand x - cat x offset - cat width
-					if (*(udata->y) >= (rand_y[11]) - 284 - 32 && *(udata->y) <= (rand_y[11]) - 284) {
-						*(udata->weapontaken) = 1;
-						specialattack_i = rand_weapon;
-
-					}
-				}
+				//	}
+				//}
 			}
 		}
 		else if (key == KB_KEY_UP)
@@ -1328,14 +1325,14 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->s) = 0 + type_i;
 				*(udata->a) = 0;
 				printf("Up\n");
+				//Pick up Weapon
+				//if (*(udata->x) >= (rand_x[10] - 379 - 44)) { 
+				//	if (*(udata->y) >= (rand_y[10]) - 284 - 32 && *(udata->y) <= (rand_y[10]) - 284) {
+				//		*(udata->weapontaken) = 1;
+				//		specialattack_i = rand_weapon;
 
-				if (*(udata->x) >= (rand_x[11] - 379 - 44)) {  //rand x - cat x offset - cat width
-					if (*(udata->y) >= (rand_y[11]) - 284 - 32 && *(udata->y) <= (rand_y[11]) - 284) {
-						*(udata->weapontaken) = 1;
-						specialattack_i = rand_weapon;
-
-					}
-				}
+				//	}
+				//}
 			}
 		}
 		else if (key == KB_KEY_DOWN)
@@ -1362,12 +1359,56 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				*(udata->s) = 1 + type_i;
 				*(udata->a) = 0;
 				printf("Down\n");
+				//Pick up Weapon
+				//if (*(udata->x) >= (rand_x[10] - 379 - 44)) { 
+				//	if (*(udata->y) >= (rand_y[10]) - 284 - 32 && *(udata->y) <= (rand_y[10]) - 284) {
+				//		*(udata->weapontaken) = 1;
+				//		specialattack_i = rand_weapon;
 
-				if (*(udata->x) >= (rand_x[11] - 379 - 44)) {  //rand x - cat x offset - cat width
-					if (*(udata->y) >= (rand_y[11]) - 284 - 32 && *(udata->y) <= (rand_y[11]) - 284) {
+				//	}
+				//}
+			}
+		}
+
+		//Pick Up Weapons
+		if (key == KB_KEY_F) {
+			if ((*udata->dir == 3)) { //LEFT SIDE
+				//[rand x - cat x offset - (cat width/2) - set range]
+				//[rand y - cat y offset - (cat height/2)] && [rand y - cat y offset]
+				if (*(udata->x) >= (rand_x[10] - 379 - 21 - 50)) {
+					if (*(udata->y) >= (rand_y[10]) - 284 - 16 && *(udata->y) <= (rand_y[10]) - 284) {
 						*(udata->weapontaken) = 1;
 						specialattack_i = rand_weapon;
-
+					}
+				}
+			}
+			if ((*udata->dir == 2)) { //RIGHT SIDE
+				//[rand x - cat x offset + (cat width/2) + set range]
+				//[rand y - cat y offset - (cat height/2)] && [rand y - cat y offset]
+				if (*(udata->x) <= (rand_x[10]) - 379 + 21 + 50) {
+					if (*(udata->y) >= (rand_y[10]) - 284 - 16 && *(udata->y) <= (rand_y[10]) - 284) {
+						*(udata->weapontaken) = 1;
+						specialattack_i = rand_weapon;
+					}
+				}
+			}
+			if ((*udata->dir == 1)) { //TOP SIDE
+				//[rand x - cat x offset - (cat height/2)] && [rand x - cat x offset + (cat width/2)]
+				//[rand y - cat y offset] && [rand y - cat y offset + (cat height/2) + set range]
+				if (*(udata->x) >= (rand_x[10]) - 379 - 21 && *(udata->x) <= (rand_x[10]) - 379 + 21) {
+					if (*(udata->y) >= (rand_y[10]) - 284 - 16 - 50 && *(udata->y) <= (rand_y[10]) - 284) {
+						*(udata->weapontaken) = 1;
+						specialattack_i = rand_weapon;
+					}
+				}
+			}
+			if ((*udata->dir == 0)) { //BOTTOM SIDE
+				//[rand x - cat x offset - (cat width/2)] && [rand x - cat x offset + (cat width/2)]
+				//[rand y - cat y offset] && [rand y - cat y offset + (cat height/2) + set range]
+				if (*(udata->x) >= (rand_x[10]) - 379 - 21 && *(udata->x) <= (rand_x[10]) - 379 + 21) {
+					if (*(udata->y) >= (rand_y[10]) - 284 && *(udata->y) <= (rand_y[10]) - 284 + 16 + 50) {
+						*(udata->weapontaken) = 1;
+						specialattack_i = rand_weapon;
 					}
 				}
 			}
@@ -1389,9 +1430,12 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			//		//printf("hp_val = %d\n", *(udata->hp_val));
 			//	}
 			//}
+
 			//moving rats (up & down)
-			if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { //rand y - cat y offset - cat height + ry && rand y - cat y offset + ry
+			//[rand x - cat x offset - cat width]
+			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
+			if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  
+				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { 
 					*(udata->hp_pos) = 0;
 					*(udata->r1_hp) -= 1;
 					//Easy Rat counts as 1 kill
@@ -1400,7 +1444,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[1] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[1] - 379 - 42)) { 
 				if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
 					*(udata->hp_pos) = 1;
 					*(udata->r2_hp) -= 1;
@@ -1410,7 +1454,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  
 				if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
 					*(udata->hp_pos) = 2;
 					*(udata->r3_hp) -= 1;
@@ -1420,7 +1464,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[3] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[3] - 379 - 42)) { 
 				if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
 					*(udata->hp_pos) = 3;
 					*(udata->r4_hp) -= 1;
@@ -1430,7 +1474,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  
 				if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
 					*(udata->hp_pos) = 4;
 					*(udata->r5_hp) -= 1;
@@ -1448,9 +1492,10 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			*(udata->s) = 2 + type_i;
 			*(udata->a) = 1;
 			printf("Light Attack Left\n");
-
-			if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { //rand y - cat y offset - cat height + ry && rand y - cat y offset + ry
+			//[rand x - cat x offset + cat width]
+			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
+			if (*(udata->x) <= (rand_x[0] - 379 + 42)) { 
+				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { 
 					*(udata->hp_pos) = 0;
 					*(udata->r1_hp) -= 1;
 					//Easy Rat counts as 1 kill
@@ -1459,7 +1504,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[1] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) <= (rand_x[1] - 379 + 42)) {  
 				if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
 					*(udata->hp_pos) = 1;
 					*(udata->r2_hp) -= 1;
@@ -1469,7 +1514,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) <= (rand_x[2] - 379 + 42)) {  
 				if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
 					*(udata->hp_pos) = 2;
 					*(udata->r3_hp) -= 1;
@@ -1479,7 +1524,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[3] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) <= (rand_x[3] - 379 + 42)) { 
 				if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
 					*(udata->hp_pos) = 3;
 					*(udata->r4_hp) -= 1;
@@ -1489,7 +1534,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) <= (rand_x[4] - 379 + 42)) {  
 				if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
 					*(udata->hp_pos) = 4;
 					*(udata->r5_hp) -= 1;
@@ -1506,9 +1551,10 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			*(udata->s) = 1 + type_i;
 			*(udata->a) = 1;
 			printf("Light Attack Down\n");
-
-			if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { //rand y - cat y offset - cat height + ry && rand y - cat y offset + ry
+			//[rand x - cat x offset - cat width] && [rand x - cat x offset + cat width]
+			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
+			if (*(udata->x) >= (rand_x[0] - 379 - 42 && *(udata->x) <= (rand_x[0]) - 379 + 42)) {  
+				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { 
 					*(udata->hp_pos) = 0;
 					*(udata->r1_hp) -= 1;
 					//Easy Rat counts as 1 kill
@@ -1517,7 +1563,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[1] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[1] - 379 - 42 && *(udata->x) <= (rand_x[1]) - 379 + 42)) { 
 				if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
 					*(udata->hp_pos) = 1;
 					*(udata->r2_hp) -= 1;
@@ -1527,7 +1573,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[2] - 379 - 42 && *(udata->x) <= (rand_x[2]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
 					*(udata->hp_pos) = 2;
 					*(udata->r3_hp) -= 1;
@@ -1537,7 +1583,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[3] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[3] - 379 - 42 && *(udata->x) <= (rand_x[3]) - 379 + 42)) { 
 				if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
 					*(udata->hp_pos) = 3;
 					*(udata->r4_hp) -= 1;
@@ -1547,7 +1593,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[4] - 379 - 42 && *(udata->x) <= (rand_x[4]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
 					*(udata->hp_pos) = 4;
 					*(udata->r5_hp) -= 1;
@@ -1564,10 +1610,11 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			*(udata->s) = 0 + type_i;
 			*(udata->a) = 1;
 			printf("Light Attack Up\n");
-
-			if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { //rand y - cat y offset - cat height + ry && rand y - cat y offset + ry
-					*(udata->hp_pos) = 0;
+			//[rand x - cat x offset - cat width] && [rand x - cat x offset + cat width]
+			//[rand y - cat y offset + ry] && [rand y - cat y offset + cat height + ry]
+			*(udata->hp_pos) = 0;
+			if (*(udata->x) >= (rand_x[0] - 379 - 42 && *(udata->x) <= (rand_x[0]) - 379 + 42)) {
+				if (*(udata->y) >= (rand_y[0]) - 284 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + 32 + *(udata->ry1)) {
 					*(udata->r1_hp) -= 1;
 					//Easy Rat counts as 1 kill
 					if (*(udata->r1_hp) <= 0) {
@@ -1575,8 +1622,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[1] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
+			if (*(udata->x) >= (rand_x[1] - 379 - 42 && *(udata->x) <= (rand_x[1]) - 379 + 42)) {  
+				if (*(udata->y) >= (rand_y[1]) - 284 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + 32 + *(udata->ry2)) {
 					*(udata->hp_pos) = 1;
 					*(udata->r2_hp) -= 1;
 					//Easy Rat counts as 1 kill
@@ -1585,8 +1632,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
+			if (*(udata->x) >= (rand_x[2] - 379 - 42 && *(udata->x) <= (rand_x[2]) - 379 + 42)) { 
+				if (*(udata->y) >= (rand_y[2]) - 284 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + 32 + *(udata->ry3)) {
 					*(udata->hp_pos) = 2;
 					*(udata->r3_hp) -= 1;
 					//Easy Rat counts as 1 kill
@@ -1595,8 +1642,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[3] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
+			if (*(udata->x) >= (rand_x[3] - 379 - 42 && *(udata->x) <= (rand_x[3]) - 379 + 42)) {  
+				if (*(udata->y) >= (rand_y[3]) - 284 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + 32 + *(udata->ry4)) {
 					*(udata->hp_pos) = 3;
 					*(udata->r4_hp) -= 1;
 					//Easy Rat counts as 1 kill
@@ -1605,8 +1652,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
+			if (*(udata->x) >= (rand_x[4] - 379 - 42 && *(udata->x) <= (rand_x[4]) - 379 + 42)) {  
+				if (*(udata->y) >= (rand_y[4]) - 284 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + 32 + *(udata->ry5)) {
 					*(udata->hp_pos) = 4;
 					*(udata->r5_hp) -= 1;
 					//Medium Rat counts as 2 kills
@@ -1624,9 +1671,10 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			*(udata->s) = 3 + type_i;
 			*(udata->a) = 2 + heavyattack_i;
 			printf("Heavy Attack Right\n");
-
-			if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { //rand y - cat y offset - cat height + ry && rand y - cat y offset + ry
+			//[rand x - cat x offset - cat width]
+			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
+			if (*(udata->x) >= (rand_x[0] - 379 - 42 && *(udata->x) <= (rand_x[0]) - 379 + 42)) {  
+				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) {
 					*(udata->hp_pos) = 0;
 					*(udata->r1_hp) -= 2;
 					//Easy Rat counts as 1 kill
@@ -1635,7 +1683,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[1] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[1] - 379 - 42 && *(udata->x) <= (rand_x[1]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
 					*(udata->hp_pos) = 1;
 					*(udata->r2_hp) -= 2;
@@ -1645,7 +1693,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[2] - 379 - 42 && *(udata->x) <= (rand_x[2]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
 					*(udata->hp_pos) = 2;
 					*(udata->r3_hp) -= 2;
@@ -1655,7 +1703,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[3] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[3] - 379 - 42 && *(udata->x) <= (rand_x[3]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
 					*(udata->hp_pos) = 3;
 					*(udata->r4_hp) -= 2;
@@ -1665,7 +1713,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[4] - 379 - 42 && *(udata->x) <= (rand_x[4]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
 					*(udata->hp_pos) = 4;
 					*(udata->r5_hp) -= 2;
@@ -1682,9 +1730,10 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			*(udata->s) = 2 + type_i;
 			*(udata->a) = 2 + heavyattack_i;
 			printf("Heavy Attack Left\n");
-
-			if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { //rand y - cat y offset - cat height + ry && rand y - cat y offset + ry
+			//[rand x - cat x offset + cat width]
+			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
+			if (*(udata->x) <= (rand_x[0] - 379 + 42)) {  
+				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { 
 					*(udata->hp_pos) = 0;
 					*(udata->r1_hp) -= 2;
 					//Easy Rat counts as 1 kill
@@ -1693,7 +1742,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[1] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) <= (rand_x[1] - 379 + 42)) {  
 				if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
 					*(udata->hp_pos) = 1;
 					*(udata->r2_hp) -= 2;
@@ -1703,7 +1752,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) <= (rand_x[2] - 379 + 42)) {  
 				if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
 					*(udata->hp_pos) = 2;
 					*(udata->r3_hp) -= 2;
@@ -1713,7 +1762,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[3] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) <= (rand_x[3] - 379 + 42)) {  
 				if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
 					*(udata->hp_pos) = 3;
 					*(udata->r4_hp) -= 2;
@@ -1723,7 +1772,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) <= (rand_x[4] - 379 + 42)) { 
 				if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
 					*(udata->hp_pos) = 4;
 					*(udata->r5_hp) -= 2;
@@ -1740,9 +1789,10 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			*(udata->s) = 1 + type_i;
 			*(udata->a) = 2 + heavyattack_i;
 			printf("Heavy Attack Down\n");
-
-			if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { //rand y - cat y offset - cat height + ry && rand y - cat y offset + ry
+			//[rand x - cat x offset - cat width] && [rand x - cat x offset + cat width]
+			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
+			if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  
+				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { 
 					*(udata->hp_pos) = 0;
 					*(udata->r1_hp) -= 2;
 					//Easy Rat counts as 1 kill
@@ -1751,7 +1801,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[1] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[1] - 379 - 42)) { 
 				if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
 					*(udata->hp_pos) = 1;
 					*(udata->r2_hp) -= 2;
@@ -1761,7 +1811,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  
 				if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
 					*(udata->hp_pos) = 2;
 					*(udata->r3_hp) -= 2;
@@ -1771,7 +1821,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[3] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[3] - 379 - 42)) { 
 				if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
 					*(udata->hp_pos) = 3;
 					*(udata->r4_hp) -= 2;
@@ -1781,7 +1831,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  //rand x - cat x offset - cat width
+			if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  
 				if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
 					*(udata->hp_pos) = 4;
 					*(udata->r5_hp) -= 2;
@@ -1798,9 +1848,10 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			*(udata->s) = 0 + type_i;
 			*(udata->a) = 2 + heavyattack_i;
 			printf("Heavy Attack Up\n");
-
-			if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { //rand y - cat y offset - cat height + ry && rand y - cat y offset + ry
+			//[rand x - cat x offset - cat width] && [rand x - cat x offset + cat width]
+			//[rand y - cat y offset + ry] && [rand y - cat y offset + cat height + ry]
+			if (*(udata->x) >= (rand_x[0] - 379 - 42 && *(udata->x) <= (rand_x[0]) - 379 + 42)) { 
+				if (*(udata->y) >= (rand_y[0]) - 284 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + 32 + *(udata->ry1)) { 
 					*(udata->hp_pos) = 0;
 					*(udata->r1_hp) -= 2;
 					//Easy Rat counts as 1 kill
@@ -1809,8 +1860,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[1] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
+			if (*(udata->x) >= (rand_x[1] - 379 - 42 && *(udata->x) <= (rand_x[1]) - 379 + 42)) {  
+				if (*(udata->y) >= (rand_y[1]) - 284 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + 32 + *(udata->ry2)) {
 					*(udata->hp_pos) = 1;
 					*(udata->r2_hp) -= 2;
 					//Easy Rat counts as 1 kill
@@ -1819,8 +1870,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
+			if (*(udata->x) >= (rand_x[2] - 379 - 42 && *(udata->x) <= (rand_x[2]) - 379 + 42)) { 
+				if (*(udata->y) >= (rand_y[2]) - 284 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + 32 + *(udata->ry3)) {
 					*(udata->hp_pos) = 2;
 					*(udata->r3_hp) -= 2;
 					//Easy Rat counts as 1 kill
@@ -1829,8 +1880,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[3] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
+			if (*(udata->x) >= (rand_x[3] - 379 - 42 && *(udata->x) <= (rand_x[3]) - 379 + 42)) { 
+				if (*(udata->y) >= (rand_y[3]) - 284 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + 32 + *(udata->ry4)) {
 					*(udata->hp_pos) = 3;
 					*(udata->r4_hp) -= 2;
 					//Easy Rat counts as 1 kill
@@ -1839,8 +1890,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  //rand x - cat x offset - cat width
-				if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
+			if (*(udata->x) >= (rand_x[4] - 379 - 42 && *(udata->x) <= (rand_x[4]) - 379 + 42)) {  
+				if (*(udata->y) >= (rand_y[4]) - 284 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + 32 + *(udata->ry5)) {
 					*(udata->hp_pos) = 4;
 					*(udata->r5_hp) -= 2;
 					//Medium Rat counts as 2 kills
@@ -1856,11 +1907,14 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		else if ((*udata->dir == 3) && (key == KB_KEY_W))
 		{
 			*(udata->s) = 3 + type_i;
-			if (specialattack_i) {
-				*(udata->a) = 7 + specialattack_i;
-			}
+			if (*(udata->weapontaken) == 1) {
+				if (specialattack_i >= 0) {
+					*(udata->a) = 7 + specialattack_i;
+				}
+			} else *(udata->a) = 0 + specialattack_i;
 			printf("Special Attack Right\n");
-
+			//[rand x - cat x offset - cat width]
+			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
 			if (*(udata->a) != 0) {
 				if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  //rand x - cat x offset - cat width
 					if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { //rand y - cat y offset - cat height + ry && rand y - cat y offset + ry
@@ -1918,14 +1972,18 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		else if ((*udata->dir == 2) && (key == KB_KEY_W))
 		{
 			*(udata->s) = 2 + type_i;
-			if (specialattack_i) {
-				*(udata->a) = 7 + specialattack_i;
+			if (*(udata->weapontaken) == 1) {
+				if (specialattack_i >= 0) {
+					*(udata->a) = 7 + specialattack_i;
+				}
 			}
+			else *(udata->a) = 0 + specialattack_i;
 			printf("Special Attack Left\n");
-
+			//[rand x - cat x offset + cat width]
+			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
 			if (*(udata->a) != 0) {
-				if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  //rand x - cat x offset - cat width
-					if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { //rand y - cat y offset - cat height + ry && rand y - cat y offset + ry
+				if (*(udata->x) <= (rand_x[0] - 379 + 42)) { 
+					if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { 
 						*(udata->hp_pos) = 0;
 						*(udata->r1_hp) -= 2;
 						//Easy Rat counts as 1 kill
@@ -1934,7 +1992,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[1] - 379 - 42)) {  //rand x - cat x offset - cat width
+				if (*(udata->x) <= (rand_x[1] - 379 + 42)) { 
 					if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
 						*(udata->hp_pos) = 1;
 						*(udata->r2_hp) -= 2;
@@ -1944,7 +2002,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  //rand x - cat x offset - cat width
+				if (*(udata->x) <= (rand_x[2] - 379 + 42)) { 
 					if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
 						*(udata->hp_pos) = 2;
 						*(udata->r3_hp) -= 2;
@@ -1954,7 +2012,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[3] - 379 - 42)) {  //rand x - cat x offset - cat width
+				if (*(udata->x) <= (rand_x[3] - 379 + 42)) { 
 					if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
 						*(udata->hp_pos) = 3;
 						*(udata->r4_hp) -= 2;
@@ -1964,7 +2022,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  //rand x - cat x offset - cat width
+				if (*(udata->x) <= (rand_x[4] - 379 + 42)) { 
 					if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
 						*(udata->hp_pos) = 4;
 						*(udata->r5_hp) -= 2;
@@ -1980,14 +2038,18 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		else if ((*udata->dir == 1) && (key == KB_KEY_W))
 		{
 			*(udata->s) = 1 + type_i;
-			if (specialattack_i) {
-				*(udata->a) = 7 + specialattack_i;
+			if (*(udata->weapontaken) == 1) {
+				if (specialattack_i >= 0) {
+					*(udata->a) = 7 + specialattack_i;
+				}
 			}
+			else *(udata->a) = 0 + specialattack_i;
 			printf("Special Attack Down\n");
-
+			//[rand x - cat x offset - cat width] && [rand x - cat x offset + cat width]
+			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
 			if (*(udata->a) != 0) {
-				if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  //rand x - cat x offset - cat width
-					if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { //rand y - cat y offset - cat height + ry && rand y - cat y offset + ry
+				if (*(udata->x) >= (rand_x[0] - 379 - 42 && *(udata->x) <= (rand_x[0]) - 379 + 42)) {
+					if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) {
 						*(udata->hp_pos) = 0;
 						*(udata->r1_hp) -= 2;
 						//Easy Rat counts as 1 kill
@@ -1996,7 +2058,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[1] - 379 - 42)) {  //rand x - cat x offset - cat width
+				if (*(udata->x) >= (rand_x[1] - 379 - 42 && *(udata->x) <= (rand_x[1]) - 379 + 42)) {
 					if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
 						*(udata->hp_pos) = 1;
 						*(udata->r2_hp) -= 2;
@@ -2006,7 +2068,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  //rand x - cat x offset - cat width
+				if (*(udata->x) >= (rand_x[2] - 379 - 42 && *(udata->x) <= (rand_x[2]) - 379 + 42)) {
 					if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
 						*(udata->hp_pos) = 2;
 						*(udata->r3_hp) -= 2;
@@ -2016,7 +2078,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[3] - 379 - 42)) {  //rand x - cat x offset - cat width
+				if (*(udata->x) >= (rand_x[3] - 379 - 42 && *(udata->x) <= (rand_x[3]) - 379 + 42)) {
 					if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
 						*(udata->hp_pos) = 3;
 						*(udata->r4_hp) -= 2;
@@ -2026,7 +2088,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  //rand x - cat x offset - cat width
+				if (*(udata->x) >= (rand_x[4] - 379 - 42 && *(udata->x) <= (rand_x[4]) - 379 + 42)) {
 					if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
 						*(udata->hp_pos) = 4;
 						*(udata->r5_hp) -= 2;
@@ -2042,14 +2104,18 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 		else if ((*udata->dir == 0) && (key == KB_KEY_W))
 		{
 			*(udata->s) = 0 + type_i;
-			if (specialattack_i) {
-				*(udata->a) = 7 + specialattack_i;
+			if (*(udata->weapontaken) == 1) {
+				if (specialattack_i >= 0) {
+					*(udata->a) = 7 + specialattack_i;
+				}
 			}
+			else *(udata->a) = 0 + specialattack_i;
 			printf("Special Attack Up\n");
-
+			//[rand x - cat x offset - cat width] && [rand x - cat x offset + cat width]
+			//[rand y - cat y offset + ry] && [rand y - cat y offset + cat height + ry]
 			if (*(udata->a) != 0) {
-				if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  //rand x - cat x offset - cat width
-					if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { //rand y - cat y offset - cat height + ry && rand y - cat y offset + ry
+				if (*(udata->x) >= (rand_x[0] - 379 - 42 && *(udata->x) <= (rand_x[0]) - 379 + 42)) { 
+					if (*(udata->y) >= (rand_y[0]) - 284 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + 32 + *(udata->ry1)) { 
 						*(udata->hp_pos) = 0;
 						*(udata->r1_hp) -= 2;
 						//Easy Rat counts as 1 kill
@@ -2058,8 +2124,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[1] - 379 - 42)) {  //rand x - cat x offset - cat width
-					if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
+				if (*(udata->x) >= (rand_x[1] - 379 - 42 && *(udata->x) <= (rand_x[1]) - 379 + 42)) {
+					if (*(udata->y) >= (rand_y[1]) - 284 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + 32 + *(udata->ry2)) {
 						*(udata->hp_pos) = 1;
 						*(udata->r2_hp) -= 2;
 						//Easy Rat counts as 1 kill
@@ -2068,8 +2134,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  //rand x - cat x offset - cat width
-					if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
+				if (*(udata->x) >= (rand_x[2] - 379 - 42 && *(udata->x) <= (rand_x[2]) - 379 + 42)) {  
+					if (*(udata->y) >= (rand_y[2]) - 284 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + 32 + *(udata->ry3)) {
 						*(udata->hp_pos) = 2;
 						*(udata->r3_hp) -= 2;
 						//Easy Rat counts as 1 kill
@@ -2078,8 +2144,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[3] - 379 - 42)) {  //rand x - cat x offset - cat width
-					if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
+				if (*(udata->x) >= (rand_x[3] - 379 - 42 && *(udata->x) <= (rand_x[3]) - 379 + 42)) { 
+					if (*(udata->y) >= (rand_y[3]) - 284 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + 32 + *(udata->ry4)) {
 						*(udata->hp_pos) = 3;
 						*(udata->r4_hp) -= 2;
 						//Easy Rat counts as 1 kill
@@ -2088,8 +2154,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  //rand x - cat x offset - cat width
-					if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
+				if (*(udata->x) >= (rand_x[4] - 379 - 42 && *(udata->x) <= (rand_x[4]) - 379 + 42)) {  
+					if (*(udata->y) >= (rand_y[4]) - 284 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + 32 + *(udata->ry5)) {
 						*(udata->hp_pos) = 4;
 						*(udata->r5_hp) -= 2;
 						//Medium Rat counts as 2 kills
