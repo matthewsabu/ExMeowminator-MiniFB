@@ -56,6 +56,10 @@ typedef struct
 	//kill count
 	int* weapontaken;
 	int* kill_count;
+	//cat health
+	int* heart_3;
+	int* heart_2;
+	int* heart_1;
 } user_data;
 
 int randomizer = 1; // RANDOMIZE ONCE ONLY
@@ -300,6 +304,14 @@ int main()
 	FreeImage_FlipVertical(fi_sprite47);
 	uint8_t* taser = FreeImage_GetBits(fi_sprite47);
 
+	FIBITMAP* fi_sprite48 = FreeImage_Load(FIF_PNG, "assets_meow/Empty_Heart.png");
+	FreeImage_FlipVertical(fi_sprite48);
+	uint8_t* sprite48 = FreeImage_GetBits(fi_sprite48);
+
+	FIBITMAP* fi_sprite49 = FreeImage_Load(FIF_PNG, "assets_meow/Full_Heart.png");
+	FreeImage_FlipVertical(fi_sprite49);
+	uint8_t* sprite49 = FreeImage_GetBits(fi_sprite49);
+
 	//// Copies the full background to the framebuffer
 	//for (int i = 0; i < map_x *  map_y * 3; i += 3)
 	//	buffer[i / 3] = (bg2[i + 2] << 16) | (bg2[i + 1] << 8) | bg2[i];
@@ -424,6 +436,10 @@ int main()
 		static int weapontaken = 0;
 		static int currency = 0;
 
+		static int heart_1 = 1;
+		static int heart_2 = 1;
+		static int heart_3 = 1;
+
 		//static int hp_val;
 		static int r1_hp = 0, r2_hp = 0, r3_hp = 0, r4_hp = 0, r5_hp = 0, r6_hp = 0, r7_hp = 0, r8_hp = 0, r9_hp = 0, r10_hp = 0;
 
@@ -436,6 +452,8 @@ int main()
 		uint8_t* easy[4] = { sprite32, sprite33, sprite34, sprite35 };
 		uint8_t* medium[4] = { sprite36, sprite37, sprite38, sprite39 };
 		uint8_t* hard[4] = { sprite40, sprite41, sprite42, sprite43 };
+
+		uint8_t* health[2] = { sprite48, sprite49 };
 
 		udata.x = &bg_x;
 		udata.x_old = &bg_x_old;
@@ -476,6 +494,10 @@ int main()
 
 		udata.kill_count = &kill_count;
 		udata.weapontaken = &weapontaken;
+
+		udata.heart_3 = &heart_3;
+		udata.heart_2 = &heart_2;
+		udata.heart_1 = &heart_1;
 
 		if (game_mode == 0) { //start menu
 			//if (direct == 0 || direct == 2) {
@@ -584,7 +606,7 @@ int main()
 				}
 			}
 
-			if(dead == 1) {
+			if (dead == 1) {
 				//portal sprite
 				for (int i = 0; i < 32; i++)
 				{
@@ -1044,6 +1066,44 @@ int main()
 				}
 			}
 
+			for (int i = 0; i < 20; i++)
+			{
+				for (int j = 0; j < 20; j++)
+				{
+					uint8_t r = health[heart_1][20 * 4 * i + 4 * j + 2];
+					uint8_t g = health[heart_1][20 * 4 * i + 4 * j + 1];
+					uint8_t b = health[heart_1][20 * 4 * i + 4 * j];
+					uint32_t pixel = (r << 16) | (g << 8) | b;
+					if (pixel)
+						buffer[map_x * (i + bg_y + 10) + (j + bg_x + 710)] = pixel;
+				}
+			}
+
+			for (int i = 0; i < 20; i++)
+			{
+				for (int j = 0; j < 20; j++)
+				{
+					uint8_t r = health[heart_2][20 * 4 * i + 4 * j + 2];
+					uint8_t g = health[heart_2][20 * 4 * i + 4 * j + 1];
+					uint8_t b = health[heart_2][20 * 4 * i + 4 * j];
+					uint32_t pixel = (r << 16) | (g << 8) | b;
+					if (pixel)
+						buffer[map_x * (i + bg_y + 10) + (j + bg_x + 735)] = pixel;
+				}
+			}
+			for (int i = 0; i < 20; i++)
+			{
+				for (int j = 0; j < 20; j++)
+				{
+					uint8_t r = health[heart_3][20 * 4 * i + 4 * j + 2];
+					uint8_t g = health[heart_3][20 * 4 * i + 4 * j + 1];
+					uint8_t b = health[heart_3][20 * 4 * i + 4 * j];
+					uint32_t pixel = (r << 16) | (g << 8) | b;
+					if (pixel)
+						buffer[map_x * (i + bg_y + 10) + (j + bg_x + 760)] = pixel;
+				}
+			}
+
 			//Rat Borders			
 			//Top and Bottom
 			if (ry1 == (-rand_y[0] + (map_y - 967))) { // -rand_y + (1293 - upper)
@@ -1198,24 +1258,24 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				//printf("BACK NOW x= %d\n", *(udata->ub_x_off));
 				//printf("BACK NOW y= %d\n", *(udata->ub_y_off));
 				//if (*(udata->direct) == 1) {
-					if (*(udata->ub_x_off) == 0 && *(udata->ub_y_off) == 365) { //BACK BUTTON
-						printf("BACKED\n");
-						*(udata->map_x) = 800;
-						*(udata->map_y) = 600;
-						*(udata->m) = 0;
-						*(udata->map_ctr) += 1;
-						*(udata->game_mode) = 0;
-						*(udata->direct) = 2;
-					}
-					if (*(udata->ub_x_off) == 256 && *(udata->ub_y_off) == 365) { //CONTINUE BUTTON
-						*(udata->map_x) = 988;
-						*(udata->map_y) = 1062;
-						*(udata->m) = 3;
-						*(udata->map_ctr) += 1;
-						*(udata->game_mode) = 2;
-					}
-				//}
+			if (*(udata->ub_x_off) == 0 && *(udata->ub_y_off) == 365) { //BACK BUTTON
+				printf("BACKED\n");
+				*(udata->map_x) = 800;
+				*(udata->map_y) = 600;
+				*(udata->m) = 0;
+				*(udata->map_ctr) += 1;
+				*(udata->game_mode) = 0;
+				*(udata->direct) = 2;
+			}
+			if (*(udata->ub_x_off) == 256 && *(udata->ub_y_off) == 365) { //CONTINUE BUTTON
+				*(udata->map_x) = 988;
+				*(udata->map_y) = 1062;
+				*(udata->m) = 3;
+				*(udata->map_ctr) += 1;
+				*(udata->game_mode) = 2;
+			}
 			//}
+		//}
 		}
 
 		if (key == KB_KEY_ENTER && *(udata->game_mode) == 0) {
@@ -1230,22 +1290,22 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			//}
 
 			//if (*(udata->game_mode) == 0 && *(udata->direct) != 2) {
-				if (*(udata->ub_y_off) == 247) { //START BUTTON
-					*(udata->map_x) = 1436;
-					*(udata->map_y) = 1293;
-					*(udata->m) = 2;
-					*(udata->map_ctr) += 1;
-					*(udata->game_mode) = 2;
-				}
-				if (*(udata->ub_y_off) == 365 && *(udata->direct) != 2) { //UPGRADES BUTTON
-					*(udata->map_x) = 800;
-					*(udata->map_y) = 600;
-					*(udata->m) = 1;
-					*(udata->map_ctr) += 1;
-					*(udata->ub) = 2;
-					*(udata->game_mode) = 1;
-					//*(udata->direct) = 1;
-				}
+			if (*(udata->ub_y_off) == 247) { //START BUTTON
+				*(udata->map_x) = 1436;
+				*(udata->map_y) = 1293;
+				*(udata->m) = 2;
+				*(udata->map_ctr) += 1;
+				*(udata->game_mode) = 2;
+			}
+			if (*(udata->ub_y_off) == 365 && *(udata->direct) != 2) { //UPGRADES BUTTON
+				*(udata->map_x) = 800;
+				*(udata->map_y) = 600;
+				*(udata->m) = 1;
+				*(udata->map_ctr) += 1;
+				*(udata->ub) = 2;
+				*(udata->game_mode) = 1;
+				//*(udata->direct) = 1;
+			}
 			//}
 		}
 
@@ -1276,6 +1336,79 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 
 				//	}
 				//}
+
+				//HEALTH_LEFT
+				/*if (*(udata->x) <= (rand_x[0] - 379)) {
+					if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + 32 + *(udata->ry1)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) <= (rand_x[1] - 379)) {
+					if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + 32 + *(udata->ry2)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) <= (rand_x[2] - 379)) {
+					if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + 32 + *(udata->ry3)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) <= (rand_x[3] - 379)) {
+					if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + 32 + *(udata->ry4)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) <= (rand_x[4] - 379)) {
+					if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + 32 + *(udata->ry5)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}*/
+
 			}
 		}
 		else if (key == KB_KEY_RIGHT)
@@ -1304,6 +1437,79 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 
 				//	}
 				//}
+
+				//HEALTH_RIGHT
+				if (*(udata->x) >= (rand_x[0] - 379)) {
+					if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + 32 + *(udata->ry1)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) >= (rand_x[1] - 379)) {
+					if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + 32 + *(udata->ry2)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) >= (rand_x[2] - 379)) {
+					if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + 32 + *(udata->ry3)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) >= (rand_x[3] - 379)) {
+					if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + 32 + *(udata->ry4)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) >= (rand_x[4] - 379)) {
+					if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + 32 + *(udata->ry5)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+
 			}
 		}
 		else if (key == KB_KEY_UP)
@@ -1339,6 +1545,79 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 
 				//	}
 				//}
+
+				//HEALTH_UP
+				/*if (*(udata->x) >= (rand_x[0] - 379 && *(udata->x) <= (rand_x[0]) - 379)) {
+					if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + 32 + *(udata->ry1)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) >= (rand_x[1] - 379 - 42 && *(udata->x) <= (rand_x[1]) - 379 + 42)) {
+					if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + 32 + *(udata->ry2)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) >= (rand_x[2] - 379 - 42 && *(udata->x) <= (rand_x[2]) - 379 + 42)) {
+					if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + 32 + *(udata->ry3)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) >= (rand_x[3] - 379 - 42 && *(udata->x) <= (rand_x[3]) - 379 + 42)) {
+					if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + 32 + *(udata->ry4)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) >= (rand_x[4] - 379 - 42 && *(udata->x) <= (rand_x[4]) - 379 + 42)) {
+					if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + 32 + *(udata->ry5)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}*/
+
 			}
 		}
 		else if (key == KB_KEY_DOWN)
@@ -1373,11 +1652,84 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 
 				//	}
 				//}
+
+				//HEALTH_DOWN
+				/*if (*(udata->x) >= (rand_x[0] - 379 && *(udata->x) <= (rand_x[0]) - 379)) {
+					if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + 32 + *(udata->ry1)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) >= (rand_x[1] - 379 && *(udata->x) <= (rand_x[1]) - 379)) {
+					if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + 32 + *(udata->ry2)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) >= (rand_x[2] - 379 && *(udata->x) <= (rand_x[2]) - 379)) {
+					if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + 32 + *(udata->ry3)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) >= (rand_x[3] - 379 && *(udata->x) <= (rand_x[3]) - 379)) {
+					if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + 32 + *(udata->ry4)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}
+				if (*(udata->x) >= (rand_x[4] - 379 && *(udata->x) <= (rand_x[4]) - 379)) {
+					if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + 32 + *(udata->ry5)) {
+						if ((*(udata->heart_3) == 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_3) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) == 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_2) = 0;
+						}
+						else if ((*(udata->heart_3) != 1) && (*(udata->heart_2) != 1) && (*(udata->heart_1) == 1)) {
+							*(udata->heart_1) = 0;
+							//*(udata->game_mode) = 0;
+						}
+					}
+				}*/
+
 			}
 		}
 
 		//Pick Up Weapons
-		if (key == KB_KEY_F) {
+		if (key == KB_KEY_D) {
 			if ((*udata->dir == 3)) { //LEFT SIDE
 				//[rand x - cat x offset - (cat width/2) - set range]
 				//[rand y - cat y offset - (cat height/2)] && [rand y - cat y offset]
@@ -1440,8 +1792,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			//moving rats (up & down)
 			//[rand x - cat x offset - cat width]
 			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
-			if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  
-				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { 
+			if (*(udata->x) >= (rand_x[0] - 379 - 42)) {
+				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) {
 					*(udata->hp_pos) = 0;
 					*(udata->r1_hp) -= 1;
 					//Easy Rat counts as 1 kill
@@ -1450,7 +1802,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[1] - 379 - 42)) { 
+			if (*(udata->x) >= (rand_x[1] - 379 - 42)) {
 				if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
 					*(udata->hp_pos) = 1;
 					*(udata->r2_hp) -= 1;
@@ -1460,7 +1812,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  
+			if (*(udata->x) >= (rand_x[2] - 379 - 42)) {
 				if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
 					*(udata->hp_pos) = 2;
 					*(udata->r3_hp) -= 1;
@@ -1470,7 +1822,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[3] - 379 - 42)) { 
+			if (*(udata->x) >= (rand_x[3] - 379 - 42)) {
 				if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
 					*(udata->hp_pos) = 3;
 					*(udata->r4_hp) -= 1;
@@ -1480,7 +1832,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  
+			if (*(udata->x) >= (rand_x[4] - 379 - 42)) {
 				if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
 					*(udata->hp_pos) = 4;
 					*(udata->r5_hp) -= 1;
@@ -1500,8 +1852,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			printf("Light Attack Left\n");
 			//[rand x - cat x offset + cat width]
 			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
-			if (*(udata->x) <= (rand_x[0] - 379 + 42)) { 
-				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { 
+			if (*(udata->x) <= (rand_x[0] - 379 + 42)) {
+				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) {
 					*(udata->hp_pos) = 0;
 					*(udata->r1_hp) -= 1;
 					//Easy Rat counts as 1 kill
@@ -1510,7 +1862,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) <= (rand_x[1] - 379 + 42)) {  
+			if (*(udata->x) <= (rand_x[1] - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
 					*(udata->hp_pos) = 1;
 					*(udata->r2_hp) -= 1;
@@ -1520,7 +1872,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) <= (rand_x[2] - 379 + 42)) {  
+			if (*(udata->x) <= (rand_x[2] - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
 					*(udata->hp_pos) = 2;
 					*(udata->r3_hp) -= 1;
@@ -1530,7 +1882,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) <= (rand_x[3] - 379 + 42)) { 
+			if (*(udata->x) <= (rand_x[3] - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
 					*(udata->hp_pos) = 3;
 					*(udata->r4_hp) -= 1;
@@ -1540,7 +1892,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) <= (rand_x[4] - 379 + 42)) {  
+			if (*(udata->x) <= (rand_x[4] - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
 					*(udata->hp_pos) = 4;
 					*(udata->r5_hp) -= 1;
@@ -1559,8 +1911,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			printf("Light Attack Down\n");
 			//[rand x - cat x offset - cat width] && [rand x - cat x offset + cat width]
 			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
-			if (*(udata->x) >= (rand_x[0] - 379 - 42 && *(udata->x) <= (rand_x[0]) - 379 + 42)) {  
-				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { 
+			if (*(udata->x) >= (rand_x[0] - 379 - 42 && *(udata->x) <= (rand_x[0]) - 379 + 42)) {
+				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) {
 					*(udata->hp_pos) = 0;
 					*(udata->r1_hp) -= 1;
 					//Easy Rat counts as 1 kill
@@ -1569,7 +1921,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[1] - 379 - 42 && *(udata->x) <= (rand_x[1]) - 379 + 42)) { 
+			if (*(udata->x) >= (rand_x[1] - 379 - 42 && *(udata->x) <= (rand_x[1]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
 					*(udata->hp_pos) = 1;
 					*(udata->r2_hp) -= 1;
@@ -1589,7 +1941,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[3] - 379 - 42 && *(udata->x) <= (rand_x[3]) - 379 + 42)) { 
+			if (*(udata->x) >= (rand_x[3] - 379 - 42 && *(udata->x) <= (rand_x[3]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
 					*(udata->hp_pos) = 3;
 					*(udata->r4_hp) -= 1;
@@ -1628,7 +1980,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[1] - 379 - 42 && *(udata->x) <= (rand_x[1]) - 379 + 42)) {  
+			if (*(udata->x) >= (rand_x[1] - 379 - 42 && *(udata->x) <= (rand_x[1]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[1]) - 284 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + 32 + *(udata->ry2)) {
 					*(udata->hp_pos) = 1;
 					*(udata->r2_hp) -= 1;
@@ -1638,7 +1990,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[2] - 379 - 42 && *(udata->x) <= (rand_x[2]) - 379 + 42)) { 
+			if (*(udata->x) >= (rand_x[2] - 379 - 42 && *(udata->x) <= (rand_x[2]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[2]) - 284 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + 32 + *(udata->ry3)) {
 					*(udata->hp_pos) = 2;
 					*(udata->r3_hp) -= 1;
@@ -1648,7 +2000,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[3] - 379 - 42 && *(udata->x) <= (rand_x[3]) - 379 + 42)) {  
+			if (*(udata->x) >= (rand_x[3] - 379 - 42 && *(udata->x) <= (rand_x[3]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[3]) - 284 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + 32 + *(udata->ry4)) {
 					*(udata->hp_pos) = 3;
 					*(udata->r4_hp) -= 1;
@@ -1658,7 +2010,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[4] - 379 - 42 && *(udata->x) <= (rand_x[4]) - 379 + 42)) {  
+			if (*(udata->x) >= (rand_x[4] - 379 - 42 && *(udata->x) <= (rand_x[4]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[4]) - 284 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + 32 + *(udata->ry5)) {
 					*(udata->hp_pos) = 4;
 					*(udata->r5_hp) -= 1;
@@ -1679,7 +2031,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			printf("Heavy Attack Right\n");
 			//[rand x - cat x offset - cat width]
 			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
-			if (*(udata->x) >= (rand_x[0] - 379 - 42 && *(udata->x) <= (rand_x[0]) - 379 + 42)) {  
+			if (*(udata->x) >= (rand_x[0] - 379 - 42 && *(udata->x) <= (rand_x[0]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) {
 					*(udata->hp_pos) = 0;
 					*(udata->r1_hp) -= 2;
@@ -1738,8 +2090,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			printf("Heavy Attack Left\n");
 			//[rand x - cat x offset + cat width]
 			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
-			if (*(udata->x) <= (rand_x[0] - 379 + 42)) {  
-				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { 
+			if (*(udata->x) <= (rand_x[0] - 379 + 42)) {
+				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) {
 					*(udata->hp_pos) = 0;
 					*(udata->r1_hp) -= 2;
 					//Easy Rat counts as 1 kill
@@ -1748,7 +2100,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) <= (rand_x[1] - 379 + 42)) {  
+			if (*(udata->x) <= (rand_x[1] - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
 					*(udata->hp_pos) = 1;
 					*(udata->r2_hp) -= 2;
@@ -1758,7 +2110,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) <= (rand_x[2] - 379 + 42)) {  
+			if (*(udata->x) <= (rand_x[2] - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
 					*(udata->hp_pos) = 2;
 					*(udata->r3_hp) -= 2;
@@ -1768,7 +2120,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) <= (rand_x[3] - 379 + 42)) {  
+			if (*(udata->x) <= (rand_x[3] - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
 					*(udata->hp_pos) = 3;
 					*(udata->r4_hp) -= 2;
@@ -1778,7 +2130,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) <= (rand_x[4] - 379 + 42)) { 
+			if (*(udata->x) <= (rand_x[4] - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
 					*(udata->hp_pos) = 4;
 					*(udata->r5_hp) -= 2;
@@ -1797,8 +2149,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			printf("Heavy Attack Down\n");
 			//[rand x - cat x offset - cat width] && [rand x - cat x offset + cat width]
 			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
-			if (*(udata->x) >= (rand_x[0] - 379 - 42)) {  
-				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { 
+			if (*(udata->x) >= (rand_x[0] - 379 - 42)) {
+				if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) {
 					*(udata->hp_pos) = 0;
 					*(udata->r1_hp) -= 2;
 					//Easy Rat counts as 1 kill
@@ -1807,7 +2159,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[1] - 379 - 42)) { 
+			if (*(udata->x) >= (rand_x[1] - 379 - 42)) {
 				if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
 					*(udata->hp_pos) = 1;
 					*(udata->r2_hp) -= 2;
@@ -1817,7 +2169,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[2] - 379 - 42)) {  
+			if (*(udata->x) >= (rand_x[2] - 379 - 42)) {
 				if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
 					*(udata->hp_pos) = 2;
 					*(udata->r3_hp) -= 2;
@@ -1827,7 +2179,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[3] - 379 - 42)) { 
+			if (*(udata->x) >= (rand_x[3] - 379 - 42)) {
 				if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
 					*(udata->hp_pos) = 3;
 					*(udata->r4_hp) -= 2;
@@ -1837,7 +2189,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[4] - 379 - 42)) {  
+			if (*(udata->x) >= (rand_x[4] - 379 - 42)) {
 				if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
 					*(udata->hp_pos) = 4;
 					*(udata->r5_hp) -= 2;
@@ -1856,8 +2208,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			printf("Heavy Attack Up\n");
 			//[rand x - cat x offset - cat width] && [rand x - cat x offset + cat width]
 			//[rand y - cat y offset + ry] && [rand y - cat y offset + cat height + ry]
-			if (*(udata->x) >= (rand_x[0] - 379 - 42 && *(udata->x) <= (rand_x[0]) - 379 + 42)) { 
-				if (*(udata->y) >= (rand_y[0]) - 284 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + 32 + *(udata->ry1)) { 
+			if (*(udata->x) >= (rand_x[0] - 379 - 42 && *(udata->x) <= (rand_x[0]) - 379 + 42)) {
+				if (*(udata->y) >= (rand_y[0]) - 284 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + 32 + *(udata->ry1)) {
 					*(udata->hp_pos) = 0;
 					*(udata->r1_hp) -= 2;
 					//Easy Rat counts as 1 kill
@@ -1866,7 +2218,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[1] - 379 - 42 && *(udata->x) <= (rand_x[1]) - 379 + 42)) {  
+			if (*(udata->x) >= (rand_x[1] - 379 - 42 && *(udata->x) <= (rand_x[1]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[1]) - 284 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + 32 + *(udata->ry2)) {
 					*(udata->hp_pos) = 1;
 					*(udata->r2_hp) -= 2;
@@ -1876,7 +2228,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[2] - 379 - 42 && *(udata->x) <= (rand_x[2]) - 379 + 42)) { 
+			if (*(udata->x) >= (rand_x[2] - 379 - 42 && *(udata->x) <= (rand_x[2]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[2]) - 284 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + 32 + *(udata->ry3)) {
 					*(udata->hp_pos) = 2;
 					*(udata->r3_hp) -= 2;
@@ -1886,7 +2238,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[3] - 379 - 42 && *(udata->x) <= (rand_x[3]) - 379 + 42)) { 
+			if (*(udata->x) >= (rand_x[3] - 379 - 42 && *(udata->x) <= (rand_x[3]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[3]) - 284 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + 32 + *(udata->ry4)) {
 					*(udata->hp_pos) = 3;
 					*(udata->r4_hp) -= 2;
@@ -1896,7 +2248,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 					}
 				}
 			}
-			if (*(udata->x) >= (rand_x[4] - 379 - 42 && *(udata->x) <= (rand_x[4]) - 379 + 42)) {  
+			if (*(udata->x) >= (rand_x[4] - 379 - 42 && *(udata->x) <= (rand_x[4]) - 379 + 42)) {
 				if (*(udata->y) >= (rand_y[4]) - 284 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + 32 + *(udata->ry5)) {
 					*(udata->hp_pos) = 4;
 					*(udata->r5_hp) -= 2;
@@ -1917,7 +2269,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 				if (specialattack_i >= 0) {
 					*(udata->a) = 7 + specialattack_i;
 				}
-			} else *(udata->a) = 0 + specialattack_i;
+			}
+			else *(udata->a) = 0 + specialattack_i;
 			printf("Special Attack Right\n");
 			//[rand x - cat x offset - cat width]
 			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
@@ -1988,8 +2341,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			//[rand x - cat x offset + cat width]
 			//[rand y - cat y offset - cat height + ry] && [rand y - cat y offset + ry]
 			if (*(udata->a) != 0) {
-				if (*(udata->x) <= (rand_x[0] - 379 + 42)) { 
-					if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) { 
+				if (*(udata->x) <= (rand_x[0] - 379 + 42)) {
+					if (*(udata->y) >= (rand_y[0]) - 284 - 32 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + *(udata->ry1)) {
 						*(udata->hp_pos) = 0;
 						*(udata->r1_hp) -= 2;
 						//Easy Rat counts as 1 kill
@@ -1998,7 +2351,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) <= (rand_x[1] - 379 + 42)) { 
+				if (*(udata->x) <= (rand_x[1] - 379 + 42)) {
 					if (*(udata->y) >= (rand_y[1]) - 284 - 32 + *(udata->ry2) && *(udata->y) <= (rand_y[1]) - 284 + *(udata->ry2)) {
 						*(udata->hp_pos) = 1;
 						*(udata->r2_hp) -= 2;
@@ -2008,7 +2361,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) <= (rand_x[2] - 379 + 42)) { 
+				if (*(udata->x) <= (rand_x[2] - 379 + 42)) {
 					if (*(udata->y) >= (rand_y[2]) - 284 - 32 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + *(udata->ry3)) {
 						*(udata->hp_pos) = 2;
 						*(udata->r3_hp) -= 2;
@@ -2018,7 +2371,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) <= (rand_x[3] - 379 + 42)) { 
+				if (*(udata->x) <= (rand_x[3] - 379 + 42)) {
 					if (*(udata->y) >= (rand_y[3]) - 284 - 32 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + *(udata->ry4)) {
 						*(udata->hp_pos) = 3;
 						*(udata->r4_hp) -= 2;
@@ -2028,7 +2381,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) <= (rand_x[4] - 379 + 42)) { 
+				if (*(udata->x) <= (rand_x[4] - 379 + 42)) {
 					if (*(udata->y) >= (rand_y[4]) - 284 - 32 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + *(udata->ry5)) {
 						*(udata->hp_pos) = 4;
 						*(udata->r5_hp) -= 2;
@@ -2120,8 +2473,8 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 			//[rand x - cat x offset - cat width] && [rand x - cat x offset + cat width]
 			//[rand y - cat y offset + ry] && [rand y - cat y offset + cat height + ry]
 			if (*(udata->a) != 0) {
-				if (*(udata->x) >= (rand_x[0] - 379 - 42 && *(udata->x) <= (rand_x[0]) - 379 + 42)) { 
-					if (*(udata->y) >= (rand_y[0]) - 284 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + 32 + *(udata->ry1)) { 
+				if (*(udata->x) >= (rand_x[0] - 379 - 42 && *(udata->x) <= (rand_x[0]) - 379 + 42)) {
+					if (*(udata->y) >= (rand_y[0]) - 284 + *(udata->ry1) && *(udata->y) <= (rand_y[0]) - 284 + 32 + *(udata->ry1)) {
 						*(udata->hp_pos) = 0;
 						*(udata->r1_hp) -= 2;
 						//Easy Rat counts as 1 kill
@@ -2140,7 +2493,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[2] - 379 - 42 && *(udata->x) <= (rand_x[2]) - 379 + 42)) {  
+				if (*(udata->x) >= (rand_x[2] - 379 - 42 && *(udata->x) <= (rand_x[2]) - 379 + 42)) {
 					if (*(udata->y) >= (rand_y[2]) - 284 + *(udata->ry3) && *(udata->y) <= (rand_y[2]) - 284 + 32 + *(udata->ry3)) {
 						*(udata->hp_pos) = 2;
 						*(udata->r3_hp) -= 2;
@@ -2150,7 +2503,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[3] - 379 - 42 && *(udata->x) <= (rand_x[3]) - 379 + 42)) { 
+				if (*(udata->x) >= (rand_x[3] - 379 - 42 && *(udata->x) <= (rand_x[3]) - 379 + 42)) {
 					if (*(udata->y) >= (rand_y[3]) - 284 + *(udata->ry4) && *(udata->y) <= (rand_y[3]) - 284 + 32 + *(udata->ry4)) {
 						*(udata->hp_pos) = 3;
 						*(udata->r4_hp) -= 2;
@@ -2160,7 +2513,7 @@ void key_press(struct mfb_window* window, mfb_key key, mfb_key_mod mod, bool isP
 						}
 					}
 				}
-				if (*(udata->x) >= (rand_x[4] - 379 - 42 && *(udata->x) <= (rand_x[4]) - 379 + 42)) {  
+				if (*(udata->x) >= (rand_x[4] - 379 - 42 && *(udata->x) <= (rand_x[4]) - 379 + 42)) {
 					if (*(udata->y) >= (rand_y[4]) - 284 + *(udata->ry5) && *(udata->y) <= (rand_y[4]) - 284 + 32 + *(udata->ry5)) {
 						*(udata->hp_pos) = 4;
 						*(udata->r5_hp) -= 2;
